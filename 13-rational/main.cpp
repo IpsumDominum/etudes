@@ -3,8 +3,15 @@
 #include <iostream>
 using namespace cosc326;
 int main(){
-    Integer thing = Integer("4023");
-    Integer thing2 = Integer("6028");
-    thing += thing2;
+    Integer thing = Integer("300");    
+    Integer thingn = Integer("-300");
+    Integer res;
+    /* addition cases
+    300 + 300
+    300 + -300
+    -300 + 300
+    -300 +-300*/
+    thing +=thing;
     std::cout<<thing<<"\n";
+
 }
