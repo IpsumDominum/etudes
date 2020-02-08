@@ -127,20 +127,27 @@ namespace cosc326 {
         int next_carry = 0;       
         bool leftabove;
         std::vector<int> result;        
-        Integer top;
-        Integer bottom;
-        largerLength = top.length;
+        Integer top = Integer();
+        Integer bottom = Integer();         
         if(i.sign==-1 & sign ==-1){
             /*Inverted, rhs = this lhs = i*/
             if(Integer(*this)<i){
                 /*this is larger numerically, if it is less, in the both
                 negative case, this should then be on top*/
-                top = Integer(*this);
-                bottom = Integer(i);
+                top.data = data;
+                top.length = length;
+                top.sign = sign;
+                bottom.length = i.length;
+                bottom.data = i.data;
+                bottom.sign = i.sign;
                 sign = -1;
             }else{
-                top = Integer(i);
-                bottom = Integer(*this);
+                top.data = i.data;
+                top.length = i.length;
+                top.sign = i.sign;
+                bottom.length = length;
+                bottom.data = data;
+                bottom.sign = sign;
                 sign = 1;
             }
         }
@@ -148,15 +155,24 @@ namespace cosc326 {
             if(Integer(*this)>i){
                 /*this is larger numerically, if it is less, in the both
                 negative case, this should then be on top*/
-                top = Integer(*this);
-                bottom = Integer(i);
-                sign = -1;
-            }else{
-                top = Integer(i);
-                bottom = Integer(*this);
+                top.data = data;
+                top.length = length;
+                top.sign = sign;
+                bottom.length = i.length;
+                bottom.data = i.data;
+                bottom.sign = i.sign;
                 sign = 1;
+            }else{
+                top.data = i.data;
+                top.length = i.length;
+                top.sign = i.sign;
+                bottom.length = length;
+                bottom.data = data;
+                bottom.sign = sign;
+                sign = -1;
             }
         }
+        largerLength = top.length;
         for(int idx=0;idx<top.length;idx++){
             res = 0;          
             next_carry = 0;              
