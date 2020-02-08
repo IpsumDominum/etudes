@@ -1,0 +1,59 @@
+# Group Submission Etude 01 - Syllable Slam
+
+#Members: Dimitar Bankov 
+          Josh Casey 
+          Uzzie Ozman Shah 
+          Chenrong Lü 
+
+To run:
+   - cat testfile.txt | python main.py
+Example Input: "test.txt"
+        hello
+        darkness
+        my
+        old
+        friend
+        I
+        have
+        came
+        to
+        talk
+        with
+        you
+        again
+        shalom 
+Example Output:
+        2
+        2
+        1
+        1
+        1
+        1
+        1
+        1
+        1
+        1
+        1
+        1
+        2
+        2
+
+
+To approach the problem, we began by attempting to
+filter out all the specific cases of combinations of
+letters which is in turn a syllable.
+Knowing that, the syllable count in a word is the number
+of un-silent vowels, we attempted to filter out the cases
+where a vowel is present but silent. Such as double vowels
+in "bee" or "see". Josh and Dimitar mainly worked on this approach.
+However, Uzzie and Chen worked on a different approach, using the cmu phonems
+dictionary to translate the word into phonems, then counting the
+number of active vowels in the phonems, this works for all
+words which is included in the english dictionary.
+Our final approach is a hybrid, where when a word is not found in the
+english dictionary we will fall back to our rules approach.
+
+13/1/2019
+
+
+

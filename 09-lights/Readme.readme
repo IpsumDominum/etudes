@@ -1,0 +1,23 @@
+Etude No.9 Lights On and Off
+-----------------------------
+Pair Members: Suhaib Aljehani and Chen Lu
+
+========================================================
+How to run:
+
+        For multi Line test cases:
+            First put all the cases, in the proper format,
+            in a file named "test.txt"
+            Or generate a test file using
+               python gen_test.py write
+            After "test.txt" is found in the same directory,
+            do multiline testing on the "light" executable
+            by: 
+               python gen_test.py exec
+        Alternatively,
+        for single case testing:
+               ./light
+        to build:
+               sh build.sh
+        
+        

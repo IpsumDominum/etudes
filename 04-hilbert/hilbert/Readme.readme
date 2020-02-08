@@ -1,0 +1,43 @@
+Hilbert Curves, Etude 04:
+
+Full Name: Chenrong Lu
+Student ID:5184070
+
+##########################################################
+# First Replace the "hilbert.txt" file extension with .js#
+# "hilbert.txt ---> Hilbert.js"				 #
+- then other instructions and explanations as follows:
+
+
+The Hilbert curves visualization can be viewed,
+by clicking on the html file.
+Potentially older versions of web browsers may run into
+issues, but should generally mostly be fine.
+Follow the instructions per the web page,
+and enter a desired order, followed by clicking
+draw(to instantly draw the "curves") or AutoDraw(to
+view an animation).
+(Note, the AutoDraw Function is only
+functional, if it is clicked before Draw, when the page is
+first refreshed, for unknown reasons)
+
+The Hilbert Curves here are generated using
+the following algorithm:
+
+    Start from 3 starting edges, making up the order 1 curve.
+    Then, iteratively, append to a list of edges, 4 copies of the current
+    curve, one rotated left by 90 degrees, one rotated right by 90 degrees, and
+    two others unchanged.
+    This new concatenated list of edges, is now the new curve.
+    Add 3 connecting edges, which have the same length, as any individual other
+    edges, on the left, right and middle, accordingly.
+
+    Iterate until order is reached, then draw the resulting curves.
+
+
+10/1 2020.
+
+
+
+
+

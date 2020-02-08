@@ -1,0 +1,9 @@
+Etude number 8
+=====================
+Name: Chenrong Lu
+Student ID: 5184070
+
+To run:
+   ./arithmetics
+To build:
+   sh build.sh

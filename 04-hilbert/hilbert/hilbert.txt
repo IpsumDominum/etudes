@@ -1,0 +1,301 @@
+   
+/* Hilbert Function
+   gets required order from user input,computes suitable sizes
+   for display canvas and hilbert curve size.
+   compute from order 1, iteratively , up to the desired order.
+*/
+function hilbert(){
+    var start_lines = [[0,1],[1,3],[3,2]];  
+    var absolute_centers = get_centers();
+    var cur_lines = get_lines(start_lines,absolute_centers);
+    
+    //Get and check user input 
+    var order = order_input.value;
+    var re = new RegExp('[^0-9]+');    
+    var check = re.exec(order); 
+    if(check!=null){
+        warn("please Enter a valid number :)");
+        return;
+    }else if(parseInt(order)>10 && !big_num.checked){
+        warn("Number entered too big!! Enable<strong style='color:rgb(255,100,100)'>Big Number mode</strong> to continue, at your own risk...");
+        return;
+    }
+    //Iteratively, from order 0 up to desired order
+    for(ijj=0;ijj<parseInt(order);ijj++){
+        ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+        if(ijj==0){
+            draw_grid();
+            grid_size = 2;
+            //order 0, do nothing except for draw grid
+        }else{
+            //Otherwise draw grid as usual
+            grid_size = Math.pow(2,ijj);
+            draw_grid();
+            
+            //Algorithm is as follows:
+            //Start from order one, take all the points of the current curve
+            //and create four copies, flip and translate accordingly,
+            //then concatenate the result to be the next current curve.
+            //Do until desired order achieved in loop.
+            left_t = send_to(scale(flip(cur_lines,"right"),2),"top_r");
+            right_t = scale(flip(cur_lines,"left"),2);
+            left_b = send_to(scale(cur_lines,2),"bot_l");
+            right_b = send_to(scale(cur_lines,2),"bot_r");
+            cur_lines = left_t.concat(right_t).concat(left_b).concat(right_b).concat(connect());
+        }    
+        if(ijj==parseInt(order)-1){
+         draw(cur_lines);   
+        }
+    }    
+
+}
+
+    
+    
+/*---------------HELPER FUNCTIONS-------------------------*/
+//Helper functions
+
+//get_lines function accesses the centers dictionary
+//which is a dictionary associating values of the initial
+//Centers of the 2x2 grid, to the starting line values.
+//Implemented for convenience display adjusting purposes.
+function get_lines(lines,centers){
+    got_lines = [];
+    for(i=0;i<lines.length;i++){
+        temp1 = [];
+        temp2 = [];
+        temp1 = centers[lines[i][0]];
+        temp2= centers[lines[i][1]];
+        got_lines.push([temp1,temp2]);
+    }
+    return got_lines;
+}
+//get_centers function gets the centers of the current grid and stores it in 
+//a look up dictionary. In this implementation the look up dictionary is only
+//used once.
+function get_centers(){
+    var grid_centres = {};
+    slot_size = ctx.canvas.width/2;
+    var idx = 0;
+    for(i=0;i<2;i++){
+        for(j=0;j<2;j++){
+            grid_centres[idx] = [[i*slot_size+slot_size/2],[j*slot_size+slot_size/2]];
+            idx +=1;
+        }
+    }
+    return grid_centres;
+}
+
+//draws the grid
+function draw_grid(){
+    ctx.strokeStyle = "black";
+    slot_size = ctx.canvas.width/grid_size;
+    var idx = 0;
+    for(i=0;i<grid_size;i++){
+        for(j=0;j<grid_size;j++){
+            ctx.strokeRect(i*slot_size,j*slot_size,slot_size,slot_size);
+            idx +=1;
+        }
+    }
+}
+/*----------------DRAWING FUNCTION------------------------------*/
+
+//Drawing function
+//@lines - Lines which are computed from the iterative hilbert function. An Array.
+function draw(lines){   
+    
+    //Apologies for the confusion,
+    // two conditions here: animating or not animating, is just whether
+    //the resulting hilbert curves are laid out at once, or slowly at a rate
+    // which the human eye can react to.
+    if(!animating){
+        ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+        draw_grid();
+        for(i=0;i<lines.length;i++){
+            //Rainbow mode just gives the line a random color.For aesthetic purposes.
+             if(rainbow_mode.checked ){
+                 var style = "rgb("+(Math.random()*255).toString() +","+ (Math.random()*255).toString()+","+ (Math.random()*255).toString() + ")";
+                ctx.strokeStyle = style;
+             }
+            //Draws the line on the canvas.
+            var line = lines[i];
+            ctx.beginPath();            
+            ctx.moveTo(line[0][0],line[0][1]);
+            ctx.lineTo(line[1][0],line[1][1]);
+            ctx.stroke();
+        }
+        return;
+    }
+    
+    
+    ///The block(s) below is just for animating the hilbert curve drawing process line by line.
+    if(!drawing){
+    animateIdx = 0;
+    window.setInterval(function(){
+        if(animateIdx<lines.length){
+            if(rainbow_mode.checked ||mystery_mode.checked){
+                 var style = "rgb("+(Math.random()*255).toString() +","+ (Math.random()*255).toString()+","+ (Math.random()*255).toString() + ")";
+                ctx.strokeStyle = style;
+             }
+            var line = lines[animateIdx];
+            ctx.beginPath();            
+            ctx.moveTo(line[0][0],line[0][1]);
+            ctx.lineTo(line[1][0],line[1][1]);
+            ctx.stroke();
+            animateIdx +=1;
+        }else{
+            window.clearInterval();
+        }
+    },10);
+        drawing = true;
+}else{
+    window.clearInterval();
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    draw_grid();
+    animateIdx = 0;
+    window.setInterval(function(){
+        if(animateIdx<lines.length){
+            if(rainbow_mode.checked ||mystery_mode.checked){
+                 var style = "rgb("+(Math.random()*255).toString() +","+ (Math.random()*255).toString()+","+ (Math.random()*255).toString() + ")";
+                ctx.strokeStyle = style;
+             }
+            var line = lines[animateIdx];
+            ctx.beginPath();            
+            ctx.moveTo(line[0][0],line[0][1]);
+            ctx.lineTo(line[1][0],line[1][1]);
+            ctx.stroke();
+            animateIdx +=1;
+        }else{
+        window.clearInterval();
+        }
+    },10);
+}
+}
+
+
+
+/*---------Computation Functions ---------*/
+
+
+//The following computation functions include:
+//weird_translation() - a helper function, for computing the amount of translation required, to justify positions of
+//                      rescaled elements of the hilbert curve
+// send_to() - a specific translation function implementing a certain shifting operation
+// flip() - a specific rotation function implementing matrix rotation to lines in the format: [[x1,y1],[x2,y2];
+// scale() - a specific scaling function implementing matrix scaling to lines in the format: [[x1,y1],[x2,y2];
+// connect() - calculates the 3 connection amendments, required, after the computation of various rotation etc.
+function weird_translation(){
+    var weird_num= 0;
+    //The rescaling results in the requirement to shift to be calculated by the following formula:
+    // shift_requirement = (canvas size) / 2^i  where i is the number of order.
+    for(i=2;i<=grid_size;i*=2){
+        weird_num += 1000/i;
+    }
+    weird_num = 500;
+    return weird_num;
+}
+
+
+// send_to() - 
+// @lines - edges to be shifted
+// @position - which corner to shift to
+//  shifts to 3 corners of the canvas, of a certain collection of lines (edges).
+function send_to(lines,position){
+    var xShift = 0;
+    var yShift = 0;
+    var weird_num = weird_translation();
+    if(position=="bot_l"){
+        xShift = 0;
+        yShift = weird_num;
+    }else if(position=="bot_r"){
+        xShift = weird_num;
+        yShift = weird_num;
+    }else if(position=="top_l"){
+    }else if(position=="top_r"){
+        xShift = weird_num;
+        yShift = 0;
+    }
+    var sent_lines = [];
+    for(i=0;i<lines.length;i++){
+    var temp_line = [[],[]];
+    var line = lines[i];
+    temp_line[0][0] = line[0][0] + xShift;
+    temp_line[0][1] = line[0][1] + yShift;
+    temp_line[1][0] = line[1][0] + xShift;
+    temp_line[1][1] = line[1][1] + yShift;        
+    sent_lines.push(temp_line);
+    }
+    return sent_lines;
+}
+
+// scale() - scales the edges inputted
+// @lines - edges to be scaled
+// @amount - scaling factor, divided
+function scale(lines,amount){
+    var scaled_lines = [];
+    for(i=0;i<lines.length;i++){
+        var temp_line = [[],[]];
+        var line = lines[i];
+        temp_line[0][0] = line[0][0]/amount;
+        temp_line[0][1] = line[0][1]/amount;
+        temp_line[1][0] = line[1][0]/amount;
+        temp_line[1][1] = line[1][1]/amount;
+        scaled_lines.push(temp_line);
+    }
+    return scaled_lines;
+}
+
+// connect is a specific function which calculates the 3 edges required to be amended, after the iterative
+// calculation of the hilbert curve.
+function connect(){
+    var connect_lines = [];
+    var line_width = ctx.canvas.height/(grid_size*2);
+    var left_line = [[line_width/2,(ctx.canvas.height/2)-(line_width/2)],
+                     [line_width/2,(ctx.canvas.height/2)+(line_width/2)]];
+    var right_line = [[ctx.canvas.width-line_width/2,(ctx.canvas.height/2)-(line_width/2)],
+                     [ctx.canvas.width-line_width/2,(ctx.canvas.height/2)+(line_width/2)]];
+    var middle_line = [[ctx.canvas.width/2-line_width/2,(ctx.canvas.height/2)+(line_width/2)],
+                     [ctx.canvas.width/2+line_width/2,(ctx.canvas.height/2)+(line_width/2)]];
+    connect_lines.push(middle_line);
+    connect_lines.push(left_line);
+    connect_lines.push(right_line);
+    return connect_lines;
+}
+
+// Flip - Calculates rotation based on the rotation matrix:
+//              [ cos(theta),-sin(theta)  [x    =   [cos(theta)x - sin(theta)y,sin(theta)x+cos(theta)y]
+//               sin(theta),cos(theta)]    y]
+function flip(lines,type){
+    flipped_lines = [];
+    for(i=0;i<lines.length;i++){
+        var temp_line = [[],[]];
+        var line = lines[i];
+        var angle = 0;
+        var shiftl = 0;
+        var shiftr = 0;
+        if(type=="left"){
+            angle = -Math.PI/2;   
+            shiftl = 4*ctx.canvas.width/(2*2);
+            shiftr = 0;
+        }else if(type=="right"){
+            angle = Math.PI/2;   
+            shiftr = 4*ctx.canvas.width/(2*2);
+            shiftl = 0;
+        }
+        temp_line[0][0] = (line[0][0] * Math.cos(angle)) - (line[0][1] * Math.sin(angle)) +shiftr;
+        temp_line[0][1] = (line[0][0] * Math.sin(angle)) + (line[0][1] * Math.cos(angle)) +shiftl;
+        temp_line[1][0] = (line[1][0] * Math.cos(angle)) - (line[1][1] * Math.sin(angle)) +shiftr;
+        temp_line[1][1] = (line[1][0] * Math.sin(angle)) + (line[1][1] * Math.cos(angle)) +shiftl;
+        flipped_lines.push(temp_line);
+    }
+    return flipped_lines
+}         
+   
+/*------------------------------------------------*/
+//Resets the grid.
+function reset(){
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    grid_size = 2;
+    draw_grid();
+    lines = [];
+}

@@ -1,0 +1,64 @@
+#-----Etude number 5 : Look who's talkig -----#
+
+
+The process of solving this problem is really just be able to
+identify a tree of cases of tokens to consider.
+
+Firstly, the input sentence is checked to see if it contains
+specifications, assumed to be included with () brackets.
+If it is found, and is valid, it is removed from the string,
+which is then further processed.
+
+The string is then split into tokens according to white space.
+The first token, if it exists, is considered to be the pronoun,
+it is checked.
+The second token, if it exists, is either going to be a "tobe"
+or an ordinary verb. "tobe" can be "are,am," or "will".
+if the second token is an ordinary verb, such as "went"
+as an example,the tense is stored to be "past" and verb_maori
+the corresponding translation.
+
+Otherwise, we move to the third token, if it exists. It is checked,
+whether if it is a valid verb which is also compatible with the "tobe".
+
+If all tokens passes and are valid, we should end up with
+a maori tense, verb and pronoun.
+These strings are then combined together and merged to be the
+final result.
+
+---Who did what and reflections---
+
+Chen did the parsing of the second and third tokens
+Sohaib helped with the first token, and typed in the
+Dictionary. 
+We learnt about Maori, and we learnt about a tip of the 
+Ice berg of the Nuance of sentence translation.
+
+---To run---
+use python version 2
+
+Both standard input and file input is supported.
+file format example : test.txt
+     ```
+     I
+     I am 
+     I shalom
+     I shalskjdlaksd
+     I x zcnakjs
+     I am alll
+     I are aslkdajs
+     I are going
+     I shalom shalom
+     I am shalom
+     I went
+     he went
+     we (2 incl) went
+     we (3 incl) went
+     we (4 incl) went
+     we (1 incl) went
+     she (2 incl) went
+     she went
+     she are going
+     ```
+
+

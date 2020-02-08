@@ -1,0 +1,125 @@
+    
+    /*NOTHING IMPORTANT IN THIS FILE, ONLY BOILERPLATE AND SUPPORTING JAVASCRIPT*/
+
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var big_num = document.getElementById("bignum");
+    var rainbow_mode = document.getElementById("rainbow");
+    var mystery_mode = document.getElementById("mystery");
+    width =1000; 
+    height = 1000;
+    ctx.canvas.width = width;
+    ctx.canvas.height = height;
+
+    var order_input = document.getElementById('order');
+var grid_size = 2;
+draw_grid();    
+var drawing = false;
+ctx.strokeStyle = "blue";
+var animate = true;
+var mystery_running = false;
+var mystery_mx = 0;
+var mystery_my = 0;
+var auto_queue = [];
+setInterval(function(){
+    if(auto_queue.length>0){
+        auto_hilbert(auto_queue.pop());
+    }    
+},1);
+    
+function warn(message){
+    document.getElementById('warning').innerHTML = message;
+}
+    
+ 
+function toggle_rainbow(){
+    if(mystery_mode.checked && mystery_running==false){        
+        var elem = document.getElementById("mysterybox"); 
+        var audio = new Audio("https://www.myinstants.com/media/sounds/epicsaxguy.mp3");
+        elem.style.display = 'block';
+        mystery_running = true;
+        var mystery_mx = 100;
+        var mystery_my = 50;
+        for(i=0;i<8;i++){
+            auto_queue.push(i);   
+        }
+        setInterval(
+    function(){
+        audio.play();
+         var style = "rgb("+(Math.random()*255).toString() +","+ (Math.random()*255).toString()+","+ (Math.random()*255).toString() + ")";
+       document.body.style.backgroundColor= style;
+                var elemLeft = parseInt(elem.style.left);
+                var elemTop = parseInt(elem.style.top);
+              if(elemLeft>window.innerWidth || elemLeft<0){
+                  elem.style.left ="0px" ;
+                  elem.innerHTML += `<img  src='https://www.otago.ac.nz/cs/groups/public/@compsci/documents/webcontent/otago680893.jpg' style='margin-left:`+Math.random()*200+`px;width:200px;height:300px;'>`;
+
+/*width:`+(20*10*Math.random())+`;height:`+(20*15*Math.random())+*/
+              }
+                if(elemTop<window.innerHeight ||elemTop<0){
+                    elem.style.top = "0px";
+                }
+              elem.style.top = parseInt(elem.style.top)+mystery_my + 'px'; 
+              elem.style.left = parseInt(elem.style.left)+mystery_mx + 'px'; 
+          },400);
+    }else{
+        var elem = document.getElementById("mysterybox"); 
+        elem.display = 'none';
+    }
+}
+var animating = false;
+      
+function auto_hilbert_normal(){
+    animating = true;
+     var start_lines = [[0,1],[1,3],[3,2]];  
+    var absolute_centers = get_centers();
+    var cur_lines = get_lines(start_lines,absolute_centers);
+ var order = order_input.value;
+    var re = new RegExp('[^0-9]+');    
+    var check = re.exec(order); 
+    if(check!=null){
+        warn("please Enter a valid number :)");
+        return;
+    }else if(parseInt(order)>10 && !big_num.checked){
+        warn("Number entered too big!! Enable<strong style='color:rgb(255,100,100)'>Big Number mode</strong> to continue, at your own risk...");
+        return;
+    }   
+    for(ijj=0;ijj<parseInt(order);ijj++){
+        ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+        if(ijj==0){
+            draw_grid();
+            grid_size = 2;
+        }else{
+            grid_size = Math.pow(2,ijj);
+            draw_grid();
+            left_t = send_to(scale(flip(cur_lines,"right"),2),"top_r");
+            right_t = scale(flip(cur_lines,"left"),2);
+            left_b = send_to(scale(cur_lines,2),"bot_l");
+            right_b = send_to(scale(cur_lines,2),"bot_r");
+            cur_lines = left_t.concat(right_t).concat(left_b).concat(right_b).concat(connect());
+        }    
+    }    
+    draw(cur_lines);
+}
+function auto_hilbert(level){
+    var start_lines = [[0,1],[1,3],[3,2]];  
+    var absolute_centers = get_centers();
+    var cur_lines = get_lines(start_lines,absolute_centers);
+    var order= level;
+    for(ijj=0;ijj<parseInt(order);ijj++){
+        ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+        if(ijj==0){
+            draw_grid();
+            grid_size = 2;
+        }else{
+            grid_size = Math.pow(2,ijj);
+            draw_grid();
+            left_t = send_to(scale(flip(cur_lines,"right"),2),"top_r");
+            right_t = scale(flip(cur_lines,"left"),2);
+            left_b = send_to(scale(cur_lines,2),"bot_l");
+            right_b = send_to(scale(cur_lines,2),"bot_r");
+            cur_lines = left_t.concat(right_t).concat(left_b).concat(right_b).concat(connect());
+        }    
+    }    
+    draw(cur_lines);
+}

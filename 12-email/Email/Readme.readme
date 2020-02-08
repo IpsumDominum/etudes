@@ -1,0 +1,14 @@
+Etude number 12
+==============================
+Name: Chenrong Lu
+Student ID: 5184070
+
+To run:
+   python email.py
+   (Both python2 and python3 supported)
+To run on multiple files:
+   cat testFilePath | python email.py
+
+The test cases used were originally written by
+James Pettit, additional test cases were added,
+and test case validity checked.

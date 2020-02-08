@@ -1,0 +1,171 @@
+#include "Integer.h"
+#include <vector>
+#include <sstream>
+#include <string>
+namespace cosc326 {
+
+    Integer::Integer() {
+        data.push_back(0);
+    }
+    Integer::Integer(const Integer& i) {
+        data = i.data;
+        sign = i.sign;
+    }
+    Integer::Integer(const std::string& s) {
+        std::istringstream iss(s);
+        char c;
+        length = 0;
+        while(iss>>c){
+            if((c=='-')||(c=='+')){
+                if(c=='-'){
+                    sign = -1;
+                }else{
+                    sign = 1;
+                }
+            }else{
+                sign = 1;
+                length +=1;
+                data.insert(data.begin(),c-'0');
+
+            }
+        }
+    }
+    Integer::~Integer() {
+    }
+    Integer& Integer::operator=(const Integer& i) {
+        return *this;
+    }
+    Integer Integer::operator-() {
+        sign *= -1;
+        return Integer(*this);
+    }
+    Integer Integer::operator+() const {
+        return Integer(*this);
+    }
+    Integer& Integer::operator+=(const Integer& i) {
+        int largerLength;
+        int res;
+        int carry = 0;
+        std::vector<int> result;
+        if(i.length > length){
+            largerLength = i.length;
+        }else{
+            largerLength = length;
+        }
+        for(int idx=0;idx<largerLength;idx++){
+            res = carry;
+            carry = 0;
+            if(idx< length){
+                res += data[idx];
+            }
+            if(idx<i.length){
+                res += i.data[idx];
+                if(res >=10){
+                    carry = std::to_string(res)[0] - '0';
+                    res  = std::to_string(res)[1] -'0';
+                }
+            }
+            result.push_back(res);
+        }
+        length = largerLength;
+        if(carry!=0){
+            result.push_back(carry);
+            length +=1;
+        }
+        data = result;
+        return *this;
+    }
+    Integer& Integer::operator-=(const Integer& i) {
+        int largerLength;
+        std::vector<int> result;
+        if(i.length > length){
+            largerLength = i.length;
+        }else{
+            largerLength = length;
+        }
+        for(int idx=0;idx<largerLength;idx++){
+
+        }
+        
+        data = result;
+        return *this;
+    }
+    
+    Integer& Integer::operator*=(const Integer& i) {
+        return *this;
+    }
+    
+    Integer& Integer::operator/=(const Integer& i) {
+        return *this;
+    }
+
+    Integer& Integer::operator%=(const Integer& i) {
+        return *this;
+    }
+
+    Integer operator+(const Integer& lhs, const Integer& rhs) {
+        return lhs;
+    }
+
+    Integer operator-(const Integer& lhs, const Integer& rhs) {
+        return lhs;
+    }
+
+    Integer operator*(const Integer& lhs, const Integer& rhs) {
+        return lhs;
+    }
+
+    Integer operator/(const Integer& lhs, const Integer& rhs) {
+        return lhs;
+    }
+
+    Integer operator%(const Integer& lhs, const Integer& rhs) {
+        return lhs;
+    }
+    std::ostream& operator<<(std::ostream& os, const Integer& i) {
+        for(int idx=i.length-1;idx>=0;idx--){
+            os<<std::to_string(i.data[idx]);
+        }
+        return os;
+    }
+
+    std::istream& operator>>(std::istream& is, Integer& i) {
+        char c;
+        std::string inputString = "";
+        while(is>>c){
+            inputString += c;
+        }
+        i = Integer(inputString);
+        return is;
+    }
+
+    bool operator<(const Integer& lhs, const Integer& rhs) {
+        return true;
+    }
+
+    bool operator> (const Integer& lhs, const Integer& rhs) {
+        return true;
+    }
+
+    bool operator<=(const Integer& lhs, const Integer& rhs) {
+        return true;
+    }
+
+    bool operator>=(const Integer& lhs, const Integer& rhs) {
+        return true;
+    }
+
+    bool operator==(const Integer& lhs, const Integer& rhs) {
+        return true;
+    }
+
+    bool operator!=(const Integer& lhs, const Integer& rhs) {
+        return true;
+    }
+
+
+    Integer gcd(const Integer& a, const Integer& b) {
+        return a;
+    }
+
+}

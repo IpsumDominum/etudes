@@ -1,0 +1,41 @@
+Graphical User Interface
+
+
+Etude Number:7
+
+Pair: Chenrong Lu and Suhaib
+
+------------------------------------
+
+Reflections:
+This Etude was very fun to work on,
+we decided to showcase the hash function,
+since it has a "fixed" size display,
+as opposed to a tree, and it is in a
+way challenging to implement a Graphical
+visualization for.
+To implement a display which involves
+animation showing each step of the Hash
+Table insertion and deletion operations,
+an animation stack had to be used, such that
+the animation is carried out one by one,after
+initially pushed onto the stack, during the
+actual operations.
+We implemented Linear probing, Quadratic probing
+and Double hashing as Collision resolution
+methods. Universal hashing was not implemented
+due to the uncertainty over the set of Universe
+of which the keys will be drawn on.
+Further development could be made to showcase
+an algorithm to find universal hash functions,
+given a selection of a Universe.
+
+In the task, Suhaib worked on the implementation
+of the hash Table, including the insertion and
+deletion operations.
+And Chen Implemented the animations.
+
+
+
+
+

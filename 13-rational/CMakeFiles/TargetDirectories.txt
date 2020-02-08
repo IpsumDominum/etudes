@@ -1,0 +1,3 @@
+/home/cshome/c/chlu/Desktop/new_etudes/Rationals/CMakeFiles/rebuild_cache.dir
+/home/cshome/c/chlu/Desktop/new_etudes/Rationals/CMakeFiles/edit_cache.dir
+/home/cshome/c/chlu/Desktop/new_etudes/Rationals/CMakeFiles/RationalThinking.dir

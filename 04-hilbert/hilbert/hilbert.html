@@ -1,0 +1,65 @@
+<style>
+  canvas{
+  width:50%;
+  height:50%;
+background:white;
+  }
+    html{
+        background:rgba(0,0,0,0.6);
+    }
+    input{
+        width:40px;   
+    }
+    
+.rainbow {
+  background-image: -webkit-gradient( linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22) );
+  background-image: gradient( linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22) );
+  color:transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+</style>
+
+<body id="body">
+    <div id="mysterybox" style="display:none;position:absolute;top:200px;left:400px;overflow:hidden">
+    <img  width=200 height=300 src="https://www.otago.ac.nz/cs/groups/public/@compsci/documents/webcontent/otago680893.jpg"
+     >
+        </div>
+<center>    
+<h1>Hilbert Curves</h1>
+<h2>Chen-cosc326-2020</h2>
+     <p style="width:50%">
+    Hilbert Curves are a type of space filling curves. The straight lines
+    crosses over every cell in the grid. And theoretically as order approaches infinity,
+    these "curves" which are one dimensional chains of points, can fill up 2d space.
+    
+    <label style="color:white">Note: Auto Draw is not functional as expected,due to unseen javascript issues. and will run into issue,if it is not the first to be clicked, as the page is refreshed, in other words, if it is not functional, refresh the page will solve it:)</label>
+    </p>
+    <hr>
+Type an integer to the Order input box, and press draw to get started :)<br>
+<label style="color:rgb(255,100,100)">Big number mode</label><input id="bignum"type="checkbox">
+    
+<label class="rainbow">Rainbow mode</label><input onclick="toggle_rainbow()"id="rainbow"type="checkbox"><br>
+
+<label style="color:white">Order: </label><input id="order">
+<button onclick="hilbert()"style="width:60px;height:40px">Draw</button>
+<button onclick="reset()"style="width:60px;height:40px;">Reset</button>
+<button onclick="auto_hilbert_normal()"style="width:60px;height:40px;">AutoDraw</button>
+<br>
+<label id="warning"style="color:rgba(255,180,180,1)"></label>
+<br>
+<canvas id="canvas"></canvas> <br>
+    <!---- WARNING, DO NOT ENABLE IF YOU HAVE EPILIPSY!-->
+<div style="display:none">
+    <label style="color:rgba(0,0,0,0.1)">Mystery Mode</label><input onclick="toggle_rainbow()"id="mystery"type="checkbox"><br>
+<label style="color:gold">EPLIPSY WARNING!!FLASHING LIGHTS!!</label>
+</div>
+</center>
+    </body>
+
+
+
+<script src="hilbert.js"></script>
+
+<script src="boilerplate.js">
+</script>

@@ -1,0 +1,9 @@
+Etude number 8
+=====================
+Name: Chenrong Lu
+Student ID: 5184070
+
+To run:
+   python test_multiple.py --testfilePath
+Example:
+   python test_multiple.py test.txt

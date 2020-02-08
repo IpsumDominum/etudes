@@ -1,0 +1,81 @@
+should pass: --------------------------------------------
+james@gmail.co.nz
+james@gmail.com
+james@gmail.com.au
+james@gmail.co.us
+james@gmail.co.ca
+james@gmail.co.uk
+james123@gmail.co.uk
+James.123@gmail.com
+James-123@gmail.co.nz
+james_123@gmail.co.ca
+james@gmail.gmail.co.nz
+james@gmail.gmail.com.au
+James@[100.200.100.100]
+James@[255.255.255.255]
+CEO@InsuroCorp.com
+gerry_at_research.techies_dot_co.uk
+cath@[139.80.91.50]
+James@[0.0.0.0]
+a.a@gmail.com
+ajames@gmail.gmail.com
+james_dot_hello@gmail.com
+james_dot_hello_at_gmail.com
+james_dot_yes@gmail.com
+james_dot_yes@gmail.co.nz
+a@gmail_dot_com
+a.a.a.a.a.a@gmail.com
+a@gmail.hello.hello.com
+a_hello.yes-ok@gmail.com
+james@gmail.gmail.gmail.com
+testagain@gmail.gamil.ok.co.nz
+should fail: --------------------------------------------
+Yes ok
+James @gmail.com
+ James@gmail.com
+james@gmail.com 
+James@[]
+James@[James]
+James@[    ]
+James@[....]
+James@[z.x.c.v]
+James@[afddfh]
+ja%mes@gmail.com
+james%gmail.com
+james@gm%ail.com
+james@gmail.cop
+james@gmail
+Jamesgmail.com
+james__at__gmail.com
+james__at__gmaildotcom
+james__at__gmail__dot__com.au
+james__at__gmail__dot__com__dot__au
+James@gmail__dot__co.uk
+james@gmail__dot__co__dot__ca
+maffu@cs.otago.ac.nz
+bob.gmail.com
+[]
+  asdas@.com
+   asdasda@aaa .com
+aaa      
+@[]
+[139.89.19.134]
+_dot_[]
+yes@[-139.-0.13.04]
+ok[139.18.34.133]@
+_at_[]
+a_a_@gmail.co.nz
+a_@gmail.com
+_a@gmail.com
+a.@gmail.com
+a_dot_@gmail.com
+_dot_a@gmail.com
+a@_dot_gmail.co.nz
+a@.gmail.co.ca
+a@gmail..co.uk
+a_at__dot_gmail.com
+a@.....gmail.......com
+a@hello...com
+james__dot_hello@gmail.com
+a__@gmail.com
+a@gma..il.com

@@ -1,0 +1,554 @@
+<style>
+    canvas{
+        width:200px;
+        height:500px;
+        /*border:black solid 1px;*/
+        background:"white";
+        border-top:black solid 1px;
+        border-bottom:black solid 1px;
+    }
+    input{
+        width:90%;
+    }
+    select{
+        width:90%;
+    }
+    button{
+        width:30%;
+    }
+    html{
+        background:rgba(0,0,0,0.1);
+    }
+    .tab{
+        width:33%;
+        border:black solid 1px;
+        
+    }
+    </style>
+
+<!--- All the HTML Stuff-->
+<div id="everything">
+    
+    <!--display Logs-->
+    <div style="height:800px;position:relative">
+    <center style="position:relative">
+        <div style="width:200px;height:500px;border:black solid 1px;position:absolute;top:160px; left:40px;overflow-y:scroll">
+             <h1>HashTables!</h1>
+            <hr>
+            <div id="addtab">
+            <strong>Add:</strong><br>
+                When a key is added to the hash table, it is hashed based on the hash function,
+            into a number, within the range of the size of the table, then inserted, if there is
+            free space, at the hashed slot. If not, the hash is updated according to the hash function, and the number of collisions so far. <br>If the table is full entirely, 
+                the add will fail. In some cases, a hash function won't guarentee to definately
+                iterate through all slots, and fail otherwise.
+                
+                </div>
+            <div id="removetab" style="display:none">
+            <strong>Remove:</strong><br>
+                When a key is to be removed in the hash table, it is hashed based on the hash function,
+            into a number, within the range of the size of the table. Then the location,
+                at the hashed value is checked to see if the key is found. If it is found,
+                it is removed.Otherwise, the hash value is updated accordingly based on the
+                hash function and the numbers of collisions so far. A remove returns not
+                found if it iterates through as many times as the size of the table.
+                </div>
+            <div id="searchtab" style="display:none">
+            <strong>Search:</strong><br>
+                Searching is similar to removing, except for that the key is not removed,
+                when it is found.
+                
+                </div>
+            <div style="position:absolute;bottom:0px;width:100%">
+            <button disabled style="width:100%;border:solid black 1px"></button>
+            <button onclick="tab('add')"class="tab">Add</button><button onclick="tab('remove')" class="tab">Remove</button><button onclick="tab('search')"class="tab">Search</button>
+                </div>
+</div>
+        <!----Display Selection options--->
+        <div style="width:200px;height:500px;border:black solid 1px;position:absolute;top:160px; right:40px;overflow-y:scroll;z-index:200;"> 
+            
+    <label>Size:</label><select id="size">
+    <option>10</option>
+    <option>20</option>
+    <option>30</option>
+    <option>40</option>
+    </select>
+           
+<label>Hash Method</label><select id="hash_method">
+    <option >Linear Probing</option>
+    <option >Quadratic Probing</option>
+    <option >Double Hashing</option>
+    </select>
+<label>Hash Function:</label><br>
+    <input id="hash_function">
+            <label></label>
+<label>Key</label><input id="key">
+    <button onclick="add()">Add</button>
+        <button onclick="remove()">Remove</button>
+            <button onclick="search()">Search</button>
+    <button onclick = "initialize()">initialize table</button>  
+        </div>
+        
+       
+<!---Title--->
+<h1>Hash table visualization</h1>
+        <h5>By Chen and Suhaib -2020</h5>
+        <div style="position:relative">
+<canvas id="canvas">  
+</canvas>
+<div id="animate_block" style="width:200px;height:45px;margin-top:-500px;">   
+        </div>
+            </div>
+    </center>
+      <div style="width:80%;height:40%;border:black solid 1px;position:absolute;top:88%; right:10%;overflow-y:scroll;z-index:200;text-align:center"> 
+<!--- Educational Info on Hash Tables--->          
+         <strong>Log Info:</strong>
+    <p id="log">
+    </p>
+          </div>
+    </div>
+</div>
+    <div id="windowtoosmall" style="display:none;text-align:center;margin-top:50%;">
+        Window too small man... Please at least use height:1000 width:800<br>
+        Currently: <p id="currentSize"></p>
+    </div>
+<script>
+    
+/*----------DOM Elements ---------*/
+  var canvas = document.getElementById("canvas");
+  var ctx = canvas.getContext("2d");
+    var size = document.getElementById('size');
+    var key_input = document.getElementById('key');
+    var log = document.getElementById('log');
+    var hash_method = document.getElementById('hash_method');
+    var animate_block = document.getElementById('animate_block');
+  ctx.canvas.width = 1000;
+  ctx.canvas.height = 2500;
+    canvas_display_height = 500;
+  ctx.fillStyle = "black";
+
+var global_table = {};
+var initialized = false;
+var table_size = 10;    
+
+    /*add_log(message, type)
+        @message : message to be loged
+        @type: type of the message
+        adds logs to the logs
+    */
+function tab(type){
+    addtab = document.getElementById("addtab");
+    removetab = document.getElementById("removetab");
+    searchtab = document.getElementById("searchtab");
+    if(type=="add"){
+        addtab.style.display = "block";
+        removetab.style.display = "none";
+        searchtab.style.display = "none";
+    }else if(type=="remove"){
+        addtab.style.display = "none";
+        removetab.style.display = "block";
+        searchtab.style.display = "none";
+    }else if(type =="search"){
+        addtab.style.display = "none";
+        removetab.style.display = "none";
+        searchtab.style.display = "block";
+    }
+}
+function add_log(message,type){
+    if(type=="warning"){
+       log.innerHTML +="<p style='color:red'>"+message+"</p>";
+    }else if(type=="success"){
+        log.innerHTML +="<p style='color:green'>"+message+"</p>";
+    }else if(type=="info"){
+        log.innerHTML +="<p style='color:blue'>"+message+"</p>";
+    }else if(type=="pending"){
+        log.innerHTML +="<p style='color:orange'>"+message+"</p>";
+    }
+}
+    /* initialize()
+        initialize the table display according to size
+    */
+function initialize(){
+   var size_select = size.options[size.selectedIndex].text;
+    table_size = size_select;
+    size_one_slot = ctx.canvas.height / parseInt(size_select);
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    global_table = HashTable(parseInt(size_select));
+    for(i=0;i<global_table.table.length;i++){
+        draw_slot(i,size_one_slot,global_table.table[i]);
+    }
+    initialized = true;
+}
+/*draw_table(table)    
+    @table: a hash Table
+    draws the table
+    */
+function draw_table(table){
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    var size_select = table_size;
+    console.log(table_size);
+    size_one_slot = ctx.canvas.height / parseInt(size_select);
+    for(i=0;i<table.length;i++){
+        draw_slot(i,size_one_slot,table[i]);
+    }
+}
+/* draw_slot(num,size,key)
+    @num: the index of which the key is ought to be inserted in the table
+    @size: size of a single slot in the table
+    @key: key to be drawn
+    draws a slot
+    */
+function draw_slot(num,size,key){
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0,(num+1)*size,ctx.canvas.width,3);
+    ctx.font = '50px serif';
+    ctx.fillText(num,0, (num+1)*size-size/2);
+    ctx.fillRect(50,(num)*size+(size*0.1),5,size*0.8);
+    ctx.fillText(key, ctx.canvas.width/2-20, (num+1)*size-size/2);
+}
+    
+/*---------------Adding and Removing, associated with button click--------------------*/
+function remove(){
+    if(key_input.value=="animating..."){
+        return;
+    }
+    var key_to_remove = key_input.value;
+    if(key_to_remove==""){
+        return;
+    }else{
+        if(global_table.cur_store==0){
+            return;
+        }
+        log.innerHTML = "";
+        add_log("Removing:  "+key_to_remove,"info");
+        if(initialized){
+        global_table.remove(key_input.value);
+        draw_table(global_table.table);
+        }
+       key_input.value="animating...";
+        key_input.disabled=true;
+    }
+}
+function add(){
+    if(key_input.value=="animating..."){
+        return;
+    }
+    if(global_table.cur_store>=global_table.size){
+        add_log("table full","warning");
+            return;
+    }
+        var key_to_add = key_input.value;
+    if(key_to_add==""){
+        return;
+    }else{
+        log.innerHTML = "";
+        add_log("Inserting:  "+key_to_add,"info");
+        if(initialized){
+            global_table.insert(key_input.value);
+            draw_table(global_table.table);
+        }
+       key_input.value="animating...";
+        key_input.disabled=true;
+    }
+}
+function search(){
+    if(key_input.value=="animating..."){
+        return;
+    }
+    var key_to_search = key_input.value;
+    if(key_to_search==""){
+        return;
+    }else{
+        if(global_table.cur_store==0){
+            return;
+        }
+        log.innerHTML = "";
+        add_log("Searching:  "+key_to_search,"info");
+        if(initialized){
+        global_table.search(key_input.value);
+        draw_table(global_table.table);
+        }
+       key_input.value="animating...";
+        key_input.disabled=true;
+    }
+}    
+    
+/*----------------Hash table --------------------*/    
+    
+/*Initilize the Hashtable*/
+var HashTable = function(size){
+    var self = {};
+    self.size = size;
+    self.table = [];
+    self.cur_store = 0;
+    self.hash_method = hash_method.value;
+    for(i=0;i<self.size;i++){
+        self.table.push("");
+    }
+    /*Add the key to the hash table. */
+    self.insert = function(key){
+        /*TODO insert into hashtable*/
+        if(key==""){
+            return;
+        }
+        hashed = self.hash_function(key) % self.size;
+        
+        var idx= hashed;
+        for(i=1;i<self.size+1;i++){
+            //If empty, insert
+                if(global_table.table[idx] == ""){
+                if(self.hash_method=="Linear Probing"){
+                    animate(i,idx,"hashed","(h(k)+i %) table_size =<br> "+ hashed +" + "+ i.toString() + " % "+ self.size);
+                }else if(self.hash_method=="Quadratic Probing"){
+                     animate(i,idx,"hashed","(h(k)+i^2) % table_size =<br> "+ hashed +" + "+ i.toString() + "^2 % "+ self.size);
+                }else if(hash_method.value=="Double Hashing"){
+                    animate(i,idx,"hashed","(h(k)+i*(1+ h(k)%(table_size-1)))% table_size =<br> "+ hashed +" + "+ i.toString() + "*(1 + "+hashed+ " % "+ "("+ self.size +"-1)))"+"%"+self.size);
+                }
+                self.cur_store +=1;
+                animate(i+1,idx,"success",key);
+                return;
+                //otherwise, apply collision resolution schemes
+            }else{                
+                animate(i,idx,"occupied",global_table.table[idx]);
+               if(self.hash_method=="Linear Probing"){
+                    animate(i,idx,"hashed","(h(k)+i %) table_size =<br> "+ hashed +" + "+ i.toString() + " % "+ self.size);
+                idx = (hashed+i)% self.size;
+                }else if(self.hash_method=="Quadratic Probing"){
+                     animate(i,idx,"hashed","(h(k)+i^2) % table_size =<br> "+ hashed +" + "+ i.toString() + "^2 % "+ self.size);
+                       idx = (hashed+Math.pow(i,2))% self.size;
+                }else if(hash_method.value=="Double Hashing"){
+                    animate(i,idx,"hashed","(h(k)+i*(1+ h(k)%(table_size-1)))% table_size =<br> "+ hashed +" + "+ i.toString() + "*(1 + "+hashed+ " % "+ "("+ self.size +"-1)))"+"%"+self.size);
+                    idx = (hashed + i*(1 + hashed%(self.size-1)))%self.size;
+                }
+            }
+        }
+        animate(1000,0,"hashingfailed","");
+    }
+    
+    /*Remove the key from the hashtable*/
+    self.remove = function(key){
+        if(key == ""){
+        return;
+        }
+        hashed = self.hash_function(key) % self.size;
+        var idx = hashed;
+        for(i = 1; i < self.size+1 ; i++){
+         if(global_table.table[idx] == key){
+              if(self.hash_method=="Linear Probing"){
+                    animate(i,idx,"hashed","(h(k)+i %) table_size =<br> "+ hashed +" + "+ i.toString() + " % "+ self.size);
+                }else if(self.hash_method=="Quadratic Probing"){
+                     animate(i,idx,"hashed","(h(k)+i^2) % table_size =<br> "+ hashed +" + "+ i.toString() + "^2 % "+ self.size);
+                }else if(hash_method.value=="Double Hashing"){
+                    animate(i,idx,"hashed","(h(k)+i*(1+ h(k)%(table_size-1)))% table_size =<br> "+ hashed +" + "+ i.toString() + "*(1 + "+hashed+ " % "+ "("+ self.size +"-1)))"+"%"+self.size);
+                }
+             self.cur_store -= 1;
+             animate(i+1,idx,"removed","")
+             return;
+            }else{                
+                animate(i,idx,"removingoccupied",global_table.table[idx]);
+                if(self.hash_method=="Linear Probing"){
+                    animate(i,idx,"hashed","(h(k)+i %) table_size =<br> "+ hashed +" + "+ i.toString() + " % "+ self.size);
+                idx = (hashed+i)% self.size;
+                }else if(self.hash_method=="Quadratic Probing"){
+                     animate(i,idx,"hashed","(h(k)+i^2) % table_size =<br> "+ hashed +" + "+ i.toString() + "^2 % "+ self.size);
+                       idx = (hashed+Math.pow(i,2))% self.size;
+                }else if(hash_method.value=="Double Hashing"){
+                    animate(i,idx,"hashed","(h(k)+i*(1+ h(k)%(table_size-1)))% table_size =<br> "+ hashed +" + "+ i.toString() + "*(1 + "+hashed+ " % "+ "("+ self.size +"-1)))"+"%"+self.size);
+                    idx = (hashed + i*(1 + hashed%(self.size-1)))%self.size;
+                }
+            }
+        }
+        animate(1000,0,"notfound","");
+    }
+    self.search = function(key){
+        if(key == ""){
+        return;
+        }
+        hashed = self.hash_function(key) % self.size;
+        var idx = hashed;
+        for(i = 1; i < self.size+1 ; i++){
+         if(global_table.table[idx] == key){
+              if(self.hash_method=="Linear Probing"){
+                    animate(i,idx,"hashed","(h(k)+i %) table_size =<br> "+ hashed +" + "+ i.toString() + " % "+ self.size);
+                }else if(self.hash_method=="Quadratic Probing"){
+                     animate(i,idx,"hashed","(h(k)+i^2) % table_size =<br> "+ hashed +" + "+ i.toString() + "^2 % "+ self.size);
+                }else if(hash_method.value=="Double Hashing"){
+                    animate(i,idx,"hashed","(h(k)+i*(1+ h(k)%(table_size-1)))% table_size =<br> "+ hashed +" + "+ i.toString() + "*(1 + "+hashed+ " % "+ "("+ self.size +"-1)))"+"%"+self.size);
+                }
+             animate(i+1,idx,"searchfound",key)
+             return;
+            }else{                
+                animate(i,idx,"removingoccupied",global_table.table[idx]);
+                if(self.hash_method=="Linear Probing"){
+                    animate(i,idx,"hashed","(h(k)+i %) table_size =<br> "+ hashed +" + "+ i.toString() + " % "+ self.size);
+                idx = (hashed+i)% self.size;
+                }else if(self.hash_method=="Quadratic Probing"){
+                     animate(i,idx,"hashed","(h(k)+i^2) % table_size =<br> "+ hashed +" + "+ i.toString() + "^2 % "+ self.size);
+                       idx = (hashed+Math.pow(i,2))% self.size;
+                }else if(hash_method.value=="Double Hashing"){
+                    animate(i,idx,"hashed","(h(k)+i*(1+ h(k)%(table_size-1)))% table_size =<br> "+ hashed +" + "+ i.toString() + "*(1 + "+hashed+ " % "+ "("+ self.size +"-1)))"+"%"+self.size);
+                    idx = (hashed + i*(1 + hashed%(self.size-1)))%self.size;
+                }
+            }
+        }
+        animate(1000,0,"searchnotfound","");
+    }
+    
+    /*The hash function used when a colision happen*/
+    self.hash_function = function(key){
+        var hashed = 0;
+        /*TODO hash the key into a hashed value */
+        for(i=0; i < key.length; i++){
+            hashed += key[i].charCodeAt(0) * (i+1);
+        }
+        return hashed
+    }
+    return self;
+}
+
+
+/*---------Interval Loop --------*/
+    
+    /*The Interval Loop checks for Hash method selection
+    and populates the Hash function display.
+    At the Same time it checks for window size validity,
+    At the Same time it also pops the animation stack, if
+    the animation stack has items in it to be animated
+    */
+setInterval(function(){   
+    var hash_function_input = document.getElementById('hash_function');
+    if(document.getElementById("hash_method").value=="Linear Probing"){
+        hash_function_input.disabled = true;
+        hash_function_input.value = "(h(k)+i)%m";
+    }else if(document.getElementById("hash_method").value=="Quadratic Probing"){
+        hash_function_input.disabled = true;
+        hash_function_input.value = "(h(k)+i^2)%m)";
+    }else if(document.getElementById("hash_method").value=="Double Hashing"){
+        hash_function_input.disabled = true;
+        hash_function_input.value = "(h(k)+i^g(k))%m";
+    }
+if(window.innerHeight<1000 || window.innerWidth<800){
+    document.getElementById('everything').style.display = "none";
+    document.getElementById('windowtoosmall').style.display = "block";
+    document.getElementById("currentSize").innerHTML = "Height: " +window.innerHeight + ", Width: " + window.innerWidth;
+    
+}else{
+    document.getElementById('everything').style.display = "block";
+     document.getElementById('windowtoosmall').style.display = "none";
+    document.getElementById("currentSize").innerHTML = "";
+}
+    if(animation_stack.length>0){        
+        if(animating==false){
+            animate_task = animation_stack.pop();
+            animate_num = animate_task.num;
+            animate_type = animate_task.type;
+            animate_key = animate_task.key;
+            window.requestAnimationFrame(animate_show);
+        }
+    }
+}, 100);
+/*----------------------------------*/    
+        
+/*------------------ANIMATIONS----------------------*/
+    
+    /* We have several types of animations 
+    one of them is to step through and check if a location is empty;
+    so animation types are :
+        -Success : highlight a block green
+        -Occupied : highlight a block orange
+        -removed :highlight a block purple
+        -removedOccupied : hightlight a block orange
+        
+            */
+var animation_stack = [];
+var progress = 0;
+var animate_num = 0;
+var animate_type = "none";
+var animate_key = "";
+var animating = false;    
+function animate(priority,num,type,key){
+    animate_task = {};
+    animate_task.priority = priority;
+    animate_task.num = num;
+    animate_task.type = type;
+    animate_task.key = key;
+    animation_stack.push(animate_task);
+    animation_stack.sort(function(a,b){
+        if(a.priority>b.priority){
+            return -1;
+        }
+        if(b.priority<a.priority){
+            return 1;
+        }
+        return 0;
+    });
+}
+function animate_show() {    
+    if(animate_type=="notfound"){
+        add_log("Key not found, cannot remove","warning");
+        key_input.value="";
+        key_input.disabled=false;
+        return;
+    }else if(animate_type=="hashingfailed"){
+        add_log("Hashing Failed :( maybe try another hash function","warning");
+        key_input.value="";
+        key_input.disabled=false;
+        return;
+    }else if(animate_type=="searchnotfound"){
+        add_log("Search not found","warning");
+        key_input.value="";
+        key_input.disabled=false;
+        return;
+    }else if(animate_type=="hashed"){
+        add_log("hashed to: <br>"+animate_key+" = "+animate_num,"info");
+        return;
+    }
+    var size_select = table_size;
+    size_one_slot = canvas_display_height/parseInt(size_select);    
+    animate_block.style.height = size_one_slot;
+    animate_block.style.marginTop = -1 * canvas_display_height + animate_num*size_one_slot;
+    global_table.table[animate_num] = animate_key;
+      draw_table(global_table.table);
+  if (progress < 20) {
+      animating = true;
+      if(animate_type=="success"){
+          animate_block.style.background = "rgba(0,200,21,"+(1-(progress/20)+-0.05).toString()+")";         
+      }else if(animate_type=="occupied"){
+          animate_block.style.background = "rgba(255,147,21,"+(1-(progress/20)+-0.05).toString()+")";         
+      }else if(animate_type=="removed"){
+          animate_block.style.background = "rgba(255,47,200,"+(1-(progress/20)+-0.05).toString()+")"; 
+      }else if(animate_type=="removingoccupied"){
+          animate_block.style.background = "rgba(255,147,21,"+(1-(progress/20)+-0.05).toString()+")"; 
+      }else if(animate_type=="searchfound"){
+          animate_block.style.background = "rgba(0,200,21,"+(1-(progress/20)+-0.05).toString()+")";         
+      }
+      progress +=1;
+    window.requestAnimationFrame(animate_show);    
+  }else{
+      ctx.fillStyle = 'black';
+      if(animate_type=="success"){
+        add_log("inserted "+animate_key+" to |"+animate_num+"|","success");
+        key_input.value="";
+          key_input.disabled=false;
+      }else if(animate_type=="occupied"){
+          add_log("|"+animate_num+"| occupied","pending");
+      }else if(animate_type=="removed"){
+          add_log("info","orangeInfo");
+          add_log("Removed "+animate_key+" at "+animate_num,"success");
+          key_input.value="";
+          key_input.disabled=false;
+      }else if(animate_type=="removingoccupied"){
+          add_log("|"+animate_num+"| not found","pending");
+      }else if(animate_type=="searchfound"){
+          add_log("Found "+animate_key+" at |"+animate_num+"|","success");
+        key_input.value="";
+          key_input.disabled=false;
+      }
+      progress = 0;
+      animate_num = 0;
+      animating = false;
+      return;
+  }
+}
+ initialize();
+  </script>

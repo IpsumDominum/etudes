@@ -1,0 +1,2 @@
+g++ arithmetics.cpp -o arithmetics
+cat test.txt | ./arithmetics
