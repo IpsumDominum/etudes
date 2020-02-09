@@ -66,34 +66,27 @@ namespace cosc326 {
 	Rational operator-(const Rational& lhs, const Rational& rhs) {
 		return lhs;
 	}
-
 	Rational operator*(const Rational& lhs, const Rational& rhs) {
 		return lhs;
 	}
-
 	Rational operator/(const Rational& lhs, const Rational& rhs) {
 		return lhs;
 	}
-
 	std::ostream& operator<<(std::ostream& os, const Rational& i) {
 		return os;
 	}
 	std::istream& operator>>(std::istream& is, Rational& i) {
 		return is;
 	}
-
 	bool operator<(const Rational& lhs, const Rational& rhs) {
 		return true;
 	}
-
 	bool operator> (const Rational& lhs, const Rational& rhs) {
 		return true;
 	}
-
 	bool operator<=(const Rational& lhs, const Rational& rhs) {
 		return true;
 	}
-
 	bool operator>=(const Rational& lhs, const Rational& rhs) {
 		return true;
 	}
@@ -105,5 +98,4 @@ namespace cosc326 {
 	bool operator!=(const Rational& lhs, const Rational& rhs) {
 		return true;
 	}
-
 }

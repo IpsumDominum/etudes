@@ -50,7 +50,7 @@ int main(int argc,const char* argv[]){
         result *= arrayn[i];
     }
     std::cout<<result<<"\n";
-    return 0;
+    exit(0);
 }
 uint64_t gcd(uint64_t a, uint64_t b) 
 {

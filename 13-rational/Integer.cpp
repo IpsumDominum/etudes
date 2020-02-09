@@ -2,6 +2,7 @@
 #include <vector>
 #include <sstream>
 #include <string>
+#include <stdexcept>
 namespace cosc326 {
 
     Integer::Integer() {
@@ -52,7 +53,7 @@ namespace cosc326 {
                         -1 + -2 -> good (sign=-1)
                         -1 + 2 -> 2-=1
         */
-        if(sign==1 & sign==-1){
+        if(sign==1 & i.sign==-1){
             Integer rhs = Integer(i);
             rhs.sign = 1;
             *this -=rhs;
@@ -201,37 +202,116 @@ namespace cosc326 {
     }
     
     Integer& Integer::operator*=(const Integer& i) {
+        int res = 0;
+        int carry = 0;
+        sign = sign * i.sign;
+        std::vector<int> result;
+        result.resize(length+i.length);
+        std::fill(result.begin(),result.end(),0);
+        for(int jdx=0;jdx<i.length;jdx++){
+            for(int idx=0;idx<length;idx++){
+                res = 0;
+                res += data[idx] * i.data[jdx] + result[idx+jdx];
+                result[idx+jdx] = res;
+            }
+        }
+        for(int ids=0;ids<length+i.length;ids++){
+            result[ids] += carry;
+            if(result[ids]>=10){
+                carry = std::to_string(result[ids])[0] - '0';
+                res  = std::to_string(result[ids])[1] -'0';
+                result[ids] = res;
+            }else{
+                carry = 0;
+            }
+        }
+        data = result;
+        length = length + i.length;
         return *this;
     }
     
     Integer& Integer::operator/=(const Integer& i) {
+        if(i==Integer("0")){
+            std::cerr<<"Dvision by Zero"<<"\n";
+            Integer error = Integer("-1");
+            data = error.data;
+            sign = error.sign;
+            length = error.length;
+            return *this;
+        }
+        Integer Q = Integer("0");
+        Q.sign = 1;
+        Q.length = 1;
+        Integer R = Integer(*this);
+        R.sign = 1;
+        R.length = length;
+        Integer D = Integer(i);
+        D.length = i.length;
+        while(true){
+            Q = Q +Integer("1");
+            R = R -D;
+        }
+        sign = sign * i.sign;
+        data = Q.data;
+        length = Q.length;
         return *this;
     }
 
     Integer& Integer::operator%=(const Integer& i) {
+        if(i==Integer("0")){
+            std::cerr<<"Dvision by Zero"<<"\n";
+            Integer error = Integer("-1");
+            data = error.data;
+            sign = error.sign;
+            length = error.length;
+            return *this;
+        }
+        sign = sign * i.sign;
+        Integer Q = Integer("0");
+        Integer R = Integer(*this);
+        Integer D = Integer(i);
+        while(R>=D){
+            Q = Q+Integer("1");
+            R = R - D;
+        }
+        data = R.data;
+        length = R.length;
         return *this;
     }
 
     Integer operator+(const Integer& lhs,const Integer& rhs) {
-        Integer(lhs) += Integer(rhs);
-        return lhs;
+        Integer res = Integer(lhs);
+        Integer opthing = Integer(rhs);
+        res += opthing;
+        return res;
     }
 
     Integer operator-(const Integer& lhs, const Integer& rhs) {
-        Integer(lhs) -= Integer(rhs);
-        return lhs;
+        Integer res = Integer(lhs);
+        Integer opthing = Integer(rhs);
+        res -= opthing;
+        return res;
     }
 
     Integer operator*(const Integer& lhs, const Integer& rhs) {
-        return lhs;
+        Integer res = Integer(lhs);
+        Integer opthing = Integer(rhs);
+        res *= opthing;
+        return res;
     }
 
     Integer operator/(const Integer& lhs, const Integer& rhs) {
-        return lhs;
+        Integer res = Integer(lhs);
+        Integer opthing = Integer(rhs);
+        res /= opthing;
+        return res;
     }
 
     Integer operator%(const Integer& lhs, const Integer& rhs) {
-        return lhs;
+        Integer res = Integer(lhs);
+        Integer opthing = Integer(rhs);
+        res %= opthing;
+        return res;
     }
     std::ostream& operator<<(std::ostream& os, const Integer& i) {
         if(i.sign<0){
@@ -294,26 +374,51 @@ namespace cosc326 {
             return true;
         }
     }
-
     bool operator<=(const Integer& lhs, const Integer& rhs) {
-        return true;
+        if(lhs<rhs || lhs==rhs){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     bool operator>=(const Integer& lhs, const Integer& rhs) {
-        return true;
+        if(lhs>rhs || lhs==rhs){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     bool operator==(const Integer& lhs, const Integer& rhs) {
+        if(lhs.sign !=rhs.sign){
+            return false;
+        }else if(lhs.length!=rhs.length){
+            return false;
+        }else{
+            for(int idx = lhs.length-1;idx>=0;idx--){
+                if(lhs.data[idx]!=rhs.data[idx]){
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
     bool operator!=(const Integer& lhs, const Integer& rhs) {
-        return true;
+        return !(lhs==rhs);
     }
-
-
     Integer gcd(const Integer& a, const Integer& b) {
-        return a;
+        Integer t;
+        Integer acopy = Integer(a);
+        Integer bcopy = Integer(b);
+        while (bcopy != Integer("0"))
+            {
+                t = bcopy;
+                bcopy = acopy % bcopy;
+                acopy = t;
+            }
+        return acopy;
     }
 
 }
