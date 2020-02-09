@@ -57,8 +57,10 @@ def parse_month(token):
     if token.isdigit():
         if(len(token)>2):
             print(token,"INVALID: month formatting error, only m and mm is valid!")
+            return -1
         if(int(token)<1 or int(token)>12):
             print(token,"INVALID: not a valid month!")
+            return -1
         else:
             token = months[int(token)-1]
     else:
