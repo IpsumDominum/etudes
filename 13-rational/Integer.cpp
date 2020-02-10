@@ -12,6 +12,7 @@ namespace cosc326 {
         data = i.data;
         sign = i.sign;
         length = i.length;
+        *this = +*this;
     }
     Integer::Integer(const std::string& s) {
         std::istringstream iss(s);
@@ -33,17 +34,34 @@ namespace cosc326 {
             length +=1;
             data.insert(data.begin(),c-'0');
         }
+        *this = +*this;
     }
     Integer::~Integer() {
     }
     Integer& Integer::operator=(const Integer& i) {
+        data = i.data;
+        sign = i.sign;
+        length = i.length;
         return *this;
     }
     Integer& Integer::operator-() {
         sign *= -1;
+        *this = +*this;
         return *this;
     }
     Integer& Integer::operator+()  {
+        bool start = true;
+        int newlength = length;
+        for(int idx=length-1;idx>=0;idx--){
+            if(start){
+                if(data[idx]==0){
+                    newlength-=1;
+                }else{
+                    start = false;
+                }
+            }
+        }
+        length = newlength;
         return *this;
     }
     Integer& Integer::operator+=(const Integer& i) {
@@ -57,6 +75,7 @@ namespace cosc326 {
             Integer rhs = Integer(i);
             rhs.sign = 1;
             *this -=rhs;
+            *this = +*this;
             return *this;
         }
         if(sign==-1 & i.sign==1){
@@ -100,6 +119,7 @@ namespace cosc326 {
             length +=1;
         }
         data = result;
+        *this = +*this;
         return *this;
     }
     Integer& Integer::operator-=(const Integer& i) {
@@ -198,6 +218,7 @@ namespace cosc326 {
         }
         length = largerLength;
         data = result;
+        *this = +*this;
         return *this;
     }
     
@@ -227,6 +248,7 @@ namespace cosc326 {
         }
         data = result;
         length = length + i.length;
+        *this = +*this;
         return *this;
     }
     
@@ -241,19 +263,27 @@ namespace cosc326 {
         }
         Integer Q = Integer("0");
         Q.sign = 1;
-        Q.length = 1;
         Integer R = Integer(*this);
         R.sign = 1;
-        R.length = length;
         Integer D = Integer(i);
-        D.length = i.length;
+        D.sign = 1;
+
         while(true){
             Q = Q +Integer("1");
             R = R -D;
+            if(R<=D){
+                if(R==D){
+                    Q = Q +Integer("1");
+                    break;
+                }
+                break;
+            }
+
         }
         sign = sign * i.sign;
         data = Q.data;
         length = Q.length;
+        *this = +*this;
         return *this;
     }
 
@@ -276,6 +306,7 @@ namespace cosc326 {
         }
         data = R.data;
         length = R.length;
+        *this = +*this;
         return *this;
     }
 
@@ -363,7 +394,6 @@ namespace cosc326 {
                 }
             }
         }
-
         return true;
     }
 
