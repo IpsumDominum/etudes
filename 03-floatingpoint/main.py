@@ -6,6 +6,9 @@ if sys.version_info >= (3,0):
 else:
     version = 2
 if __name__ =="__main__":
+    if(version==3):
+        print("Python 3 not supported, please use python 2")
+        exit()
     try:
         print("Please enter an input file path")
         inputpath = raw_input() if version==2 else input()

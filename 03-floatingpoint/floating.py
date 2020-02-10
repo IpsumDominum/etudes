@@ -56,7 +56,7 @@ def parseIBMfloating(inputpath,inputprecision):
     return results
 
 def writeIEEE(outputpath,results,outputprecision):
-        """
+    """
     writeIEEE
          @outputpath - output file path, output file will be
                        written line by line, each line is a
