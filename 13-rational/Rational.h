@@ -13,7 +13,7 @@ namespace cosc326 {
 	public:
             Integer denom;
             Integer num;
-            int sign;
+            int ratsign;
             Rational();
             Rational(const std::string& str);
             Rational(const Rational& r);
@@ -24,8 +24,8 @@ namespace cosc326 {
             
             Rational& operator=( const Rational& r); // q = r;
             // Unary operators
-            Rational operator-() const; // -r;
-            Rational operator+() const; // +r;
+            Rational operator-(); // -r;
+            Rational operator+(); // +r;
             // Arithmetic assignment operators
             Rational& operator+=(const Rational& r); // q += r;
             Rational& operator-=(const Rational& r); // q -= r;

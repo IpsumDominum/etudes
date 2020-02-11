@@ -3,10 +3,13 @@
 #include <sstream>
 #include <string>
 #include <stdexcept>
+#include <ctype.h>
 namespace cosc326 {
 
     Integer::Integer() {
         data.push_back(0);
+        length = 1;
+        sign = 1;
     }
     Integer::Integer(const Integer& i) {
         data = i.data;
@@ -31,8 +34,17 @@ namespace cosc326 {
             data.insert(data.begin(),c-'0');
         }
         while(iss>>c){
-            length +=1;
-            data.insert(data.begin(),c-'0');
+            if(isdigit(c)){
+                length +=1;
+                data.insert(data.begin(),c-'0');
+            }else{
+                std::cerr<<"Invalid Inputs for Integer Initialization : "<<s<<"\n";
+                exit(EXIT_FAILURE);
+            }
+        }
+        if(length==0){
+            std::cerr<<"Invalid Inputs for Integer Initialization : "<<s<<"\n";
+            exit(EXIT_FAILURE);
         }
         *this = +*this;
     }
@@ -61,7 +73,13 @@ namespace cosc326 {
                 }
             }
         }
+        if(start){
+            /*If no other numbers are found, the number is zero*/
+            sign = 1;
+            return *this;
+        }else{
         length = newlength;
+        }
         return *this;
     }
     Integer& Integer::operator+=(const Integer& i) {
