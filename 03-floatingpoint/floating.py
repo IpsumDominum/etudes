@@ -94,13 +94,11 @@ def writeIEEE(outputpath,results,outputprecision):
                 try:
                     packed = struct.pack('>f',data).encode('hex')
                 except OverflowError:
-                    """
                     if(outputhex):
                         if(data>=0):
                             packed = "7F800000"
                         elif(data<0):
                             packed = "FF800000"
-                    """
                     if(data>=0):
                         packed = "01111111100000000000000000000000"
                     elif(data<0):
