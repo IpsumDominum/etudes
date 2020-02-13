@@ -1,6 +1,7 @@
 import os
 import struct
 import re
+import binascii
 def parseIBMfloating(inputpath,inputprecision):
 
     """
@@ -22,18 +23,33 @@ def parseIBMfloating(inputpath,inputprecision):
     results = []
     #Check for precision 
     expectedLength = 32 if inputprecision=="single" else 64
-    with open(inputpath,"r") as file:
-        nums = file.readlines()
-        for linenum,oneNum in enumerate(nums):
+    with open(inputpath,"rb" if inputpath.endswith(".bin") else "r") as file:
+        if(inputpath.endswith(".bin")):
+            stringthing = ""
+            byte = file.read(1)
+            while byte!="":
+                byte = file.read(1)
+                stringthing +=byte
+            stringthing = binascii.hexlify(stringthing)
+            stringerthings = []
+            idx = 0
+            incresize = 8 if(inputprecision=="single") else 16
+            while(not (idx+incresize>len(stringthing))):
+                stringerthings.append(stringthing[idx:idx+incresize])
+                idx = idx +incresize
+            stringerthings.append(stringthing[idx:])
+        else:
+            stringerthings = file.readlines()
+        for linenum,oneNum in enumerate(stringerthings):
             oneNum = oneNum.strip("\n").replace(" ","")
             #Check if oneNum is hex            
             if(len(oneNum)!=8):
-                print("line: {} | Invalid Input: {}".format(linenum,oneNum))
+                print("line: {} | Ignored: {}".format(linenum,oneNum))
                 continue
             try:
                 oneNum = "{0:08b}".format(int(oneNum,16))
             except ValueError:
-                print("line: {} | Invalid Input: {}".format(linenum,oneNum))
+                print("line: {} | Ignored: {}".format(linenum,oneNum))
                 continue
             if(len(oneNum)==expectedLength):
                 pass
@@ -71,10 +87,24 @@ def writeIEEE(outputpath,results,outputprecision):
                    into python double() or float() data types.
                    And write out the result to outputfile.
     """
-    with open(outputpath,"w") as out_file:
+    writetype = "wb" if(outputpath.endswith(".bin")) else "w"
+    with open(outputpath,writetype) as out_file:
         for data in results:
             if(outputprecision=="single"):
-                packed = struct.pack('>f',data).encode('hex')
+                try:
+                    packed = struct.pack('>f',data).encode('hex')
+                except OverflowError:
+                    """
+                    if(outputhex):
+                        if(data>=0):
+                            packed = "7F800000"
+                        elif(data<0):
+                            packed = "FF800000"
+                    """
+                    if(data>=0):
+                        packed = "01111111100000000000000000000000"
+                    elif(data<0):
+                        packed = "01111111100000000000000000000000"
                 bin = "{0:08b}".format(int(packed,16))
                 if(bin[0]=="0"):
                     if(int(bin)==0):
@@ -83,11 +113,24 @@ def writeIEEE(outputpath,results,outputprecision):
                     if(int(bin[1:])==0):
                         bin = "1"+"0"*31
                 if(len(bin)==31):
-                    out_file.write("0"+bin+"\n")
+                    out_file.write("0"+bin)
                 else:
-                    out_file.write(bin+"\n")
+                    out_file.write(bin)
             elif(outputprecision=="double"):
-                packed = struct.pack('>d',data).encode('hex')
+                try:
+                    packed = struct.pack('>d',data).encode('hex')
+                except OverflowError:
+                    """
+                    if(outputhex):
+                        if(data>=0):
+                            packed = "7F80000000000000"
+                        elif(data<0):
+                            packed = "FF80000000000000"
+                    """
+                    if(data>=0):
+                        packed = "01111111100000000000000000000000" + "0"*32
+                    elif(data<0):
+                        packed = "11111111100000000000000000000000" + "0"*32
                 bin = "{0:08b}".format(int(packed,16))
                 if(bin[0]=="0"):
                     if(int(bin)==0):
@@ -120,19 +163,11 @@ def insert_dot(fraction,pos):
     #inserts the dot, and treat before and after separately.
     return fraction[:pos], fraction[pos:].strip("0")
 """
-#testing
-def test():
-    oneNum = "01000010011101101010000000000000"
-    oneNum = "01111111111111111111111111111111"
-    if(oneNum[0]=="1"):
-        sign = -1
-    elif(oneNum[0]=="0"):
-        sign = 1
-    exponent = oneNum[1:8]
-    fraction = oneNum[8:]
-    expodigit = bin_to_digit(exponent) - 64
-    afterdigit = bin_to_digit_after(fraction)
-    result = (afterdigit*(16**expodigit)) * sign
-    print(result)
-test()
+#Testing
+if __name__ =="__main__":
+    def test():
+        inputpath = "testibm_single.bin"
+        inputprecision = "single"
+        parseIBMfloating(inputpath,inputprecision)
+    test()
 """

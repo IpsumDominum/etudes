@@ -22,53 +22,53 @@ namespace cosc326 {
 			std::string buffer =  "";
 	    	char c;			
 	        while(iss>>c){							
-				if(expectingFirst){
-					if(c=='.'){
-						/*if a dot is found*/
-						w = Integer(buffer);
-						expectingFirst = false;
-						founddot = true;
-						buffer = "";
-					}else if(c=='/'){
-						a = Integer(buffer);
-						expectingFirst = false;
-						buffer = "";
-					}else{
-						buffer += c;
-					}
-				}else{
-					if(c=='/'){
-						a = Integer(buffer);
-						buffer = "";						
-					}else{
-						buffer +=c;
-					}
-				}
-			}
-			b = Integer(buffer);
-			ratsign = w.sign * b.sign * a.sign;
-			if(founddot){
-				a += w *b;				
-			}			
-			num = a;
-			denom = b;			
+                    if(expectingFirst){
+                        if(c=='.'){
+                            /*if a dot is found*/
+                            w = Integer(buffer);
+                            expectingFirst = false;
+                            founddot = true;
+                            buffer = "";
+                        }else if(c=='/'){
+                            a = Integer(buffer);
+                            expectingFirst = false;
+                            buffer = "";
+                        }else{
+                            buffer += c;
+                        }
+                    }else{
+                        if(c=='/'){
+                            a = Integer(buffer);
+                            buffer = "";						
+                        }else{
+                            buffer +=c;
+                        }
+                    }
+                }
+                b = Integer(buffer);
+                ratsign = w.sign * b.sign * a.sign;
+                if(founddot){
+                    a += w *b;				
+                }			
+                num = a;
+                denom = b;			
+                num.sign = 1;
+                denom.sign = 1;
+                *this = +*this;
+	}
+    Rational::Rational(const Rational& r) {
+        *this = r;
+    }
+    Rational::Rational(const Integer& a) {
+        num = Integer(a);
+        denom = Integer("1");			
+        ratsign = num.sign;
 			num.sign = 1;
 			denom.sign = 1;
 			*this = +*this;
-	}
-	Rational::Rational(const Rational& r) {
-			*this = r;
-	}
-	Rational::Rational(const Integer& a) {
-            num = Integer(a);
-            denom = Integer("1");			
-			ratsign = num.sign;
-			num.sign = 1;
-			denom.sign = 1;
-			*this = +*this;
-	}
-	Rational::Rational(const Integer& a, const Integer& b) {
-            num = Integer(a);
+    }
+    Rational::Rational(const Integer& a, const Integer& b) {
+        num = Integer(a);
             denom = Integer(b);
 			ratsign = num.sign * denom.sign;
 			num.sign = 1;
@@ -172,8 +172,8 @@ namespace cosc326 {
 				*this = -(*this + r);
 				return *this;
 			}else if(r.ratsign==-1){
-				/*send to b-a*/
-				Rational rhs = Rational(r);
+                            /*send to b-a*/
+                            Rational rhs = Rational(r);
 				ratsign = 1;				
 				rhs -= *this;
 				*this = Rational(rhs);

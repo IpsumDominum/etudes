@@ -3,18 +3,26 @@
 #include <sstream>
 #include <string>
 #include <stdexcept>
+#include <ctype.h>
 namespace cosc326 {
-
+    
     Integer::Integer() {
+        /*Create default integer*/
         data.push_back(0);
+        length = 1;
+        sign = 1;
     }
     Integer::Integer(const Integer& i) {
+        /*Copy the Integer in the parameter*/
         data = i.data;
         sign = i.sign;
         length = i.length;
         *this = +*this;
     }
     Integer::Integer(const std::string& s) {
+        /*Create an Integer through parameter string
+          check first if first character is "-" or "+"
+         */
         std::istringstream iss(s);
         char c;
         length = 0;
@@ -31,25 +39,40 @@ namespace cosc326 {
             data.insert(data.begin(),c-'0');
         }
         while(iss>>c){
-            length +=1;
-            data.insert(data.begin(),c-'0');
+            if(isdigit(c)){
+                length +=1;
+                data.insert(data.begin(),c-'0');
+            }else{
+                //Check for invalid inputs
+                std::cerr<<"Invalid Inputs for Integer Initialization : "<<s<<"\n";
+                exit(EXIT_FAILURE);
+            }
+        }
+        if(length==0){
+            //Check for invalid inputs
+            std::cerr<<"Invalid Inputs for Integer Initialization : "<<s<<"\n";
+            exit(EXIT_FAILURE);
         }
         *this = +*this;
     }
     Integer::~Integer() {
+        /*destructor not needed */
     }
     Integer& Integer::operator=(const Integer& i) {
+        /*assignment operator, copies data */
         data = i.data;
         sign = i.sign;
         length = i.length;
         return *this;
     }
     Integer& Integer::operator-() {
+        /*negation operator, negates sign*/
         sign *= -1;
         *this = +*this;
         return *this;
     }
     Integer& Integer::operator+()  {
+        /*normalization operator, normalizes the integer, gets rid of leading zeros*/
         bool start = true;
         int newlength = length;
         for(int idx=length-1;idx>=0;idx--){
@@ -61,7 +84,13 @@ namespace cosc326 {
                 }
             }
         }
+        if(start){
+            /*If no other numbers are found, the number is zero*/
+            sign = 1;
+            return *this;
+        }else{
         length = newlength;
+        }
         return *this;
     }
     Integer& Integer::operator+=(const Integer& i) {
@@ -89,6 +118,17 @@ namespace cosc326 {
         if(sign==1 & i.sign==1){
             sign = 1;
         }
+        /*Addition operation:
+          add top and bottom numbers,
+          based on intuitive addition
+
+          123
+          123
+          ---
+          246
+
+          add numbers, if over 10 , add carry to next digit
+         */
         int largerLength;
         int res;
         int carry = 0;
@@ -141,7 +181,18 @@ namespace cosc326 {
             *this +=rhs;
             sign = -1;
             return *this;
-        }        
+        }
+
+        /*Subtraction operation
+          intuitive subtraction
+
+          123
+          123
+          ---
+          000
+          find the lrger on top, and then minus each digit,
+          careful with carry and then is ok.
+         */
         int largerLength;
         int res = 0;
         int carry = 0;
@@ -210,7 +261,12 @@ namespace cosc326 {
                     }
                 }else{
                     /*otherwise drop down*/
-                    res = top.data[idx]+carry;
+                    if(top.data[idx]+carry<0){
+                        res = (top.data[idx]+10)+carry;
+                        next_carry = -1;
+                    }else{
+                        res = top.data[idx]+carry;
+                    }
                 }
             }
             carry = next_carry;
@@ -223,6 +279,12 @@ namespace cosc326 {
     }
     
     Integer& Integer::operator*=(const Integer& i) {
+        /*
+          intuitive multiplication
+
+          multiply each digit, and careful with carrry.
+          
+         */
         int res = 0;
         int carry = 0;
         sign = sign * i.sign;
@@ -253,6 +315,11 @@ namespace cosc326 {
     }
     
     Integer& Integer::operator/=(const Integer& i) {
+        /*
+          euclidean algorithm division ,
+          minus until reached above dividend.
+          add result by one each iteration
+         */
         if(i==Integer("0")){
             std::cerr<<"Dvision by Zero"<<"\n";
             Integer error = Integer("-1");
@@ -288,6 +355,12 @@ namespace cosc326 {
     }
 
     Integer& Integer::operator%=(const Integer& i) {
+        /*
+          euclidean algorithm division ,
+          minus until reached above dividend.
+          add result by one each iteration
+          remainder is what is left over.
+         */
         if(i==Integer("0")){
             std::cerr<<"Dvision by Zero"<<"\n";
             Integer error = Integer("-1");
@@ -297,11 +370,9 @@ namespace cosc326 {
             return *this;
         }
         sign = sign * i.sign;
-        Integer Q = Integer("0");
         Integer R = Integer(*this);
         Integer D = Integer(i);
         while(R>=D){
-            Q = Q+Integer("1");
             R = R - D;
         }
         data = R.data;
@@ -311,6 +382,7 @@ namespace cosc326 {
     }
 
     Integer operator+(const Integer& lhs,const Integer& rhs) {
+        //Referes to the other function
         Integer res = Integer(lhs);
         Integer opthing = Integer(rhs);
         res += opthing;
@@ -318,6 +390,7 @@ namespace cosc326 {
     }
 
     Integer operator-(const Integer& lhs, const Integer& rhs) {
+        //Referes to the other function
         Integer res = Integer(lhs);
         Integer opthing = Integer(rhs);
         res -= opthing;
@@ -325,6 +398,7 @@ namespace cosc326 {
     }
 
     Integer operator*(const Integer& lhs, const Integer& rhs) {
+        //Referes to the other function
         Integer res = Integer(lhs);
         Integer opthing = Integer(rhs);
         res *= opthing;
@@ -332,6 +406,7 @@ namespace cosc326 {
     }
 
     Integer operator/(const Integer& lhs, const Integer& rhs) {
+        //Referes to the other function
         Integer res = Integer(lhs);
         Integer opthing = Integer(rhs);
         res /= opthing;
@@ -339,12 +414,14 @@ namespace cosc326 {
     }
 
     Integer operator%(const Integer& lhs, const Integer& rhs) {
+        //Referes to the other function
         Integer res = Integer(lhs);
         Integer opthing = Integer(rhs);
         res %= opthing;
         return res;
     }
     std::ostream& operator<<(std::ostream& os, const Integer& i) {
+        //Streaming operator
         if(i.sign<0){
             os<<"-";
         }
@@ -439,6 +516,9 @@ namespace cosc326 {
         return !(lhs==rhs);
     }
     Integer gcd(const Integer& a, const Integer& b) {
+        /*
+          Euclidean algorithm
+         */
         Integer t;
         Integer acopy = Integer(a);
         Integer bcopy = Integer(b);
