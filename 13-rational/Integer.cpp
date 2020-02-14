@@ -462,6 +462,10 @@ namespace cosc326 {
                    return true;
                 }
             }else{
+                /*
+                  Then check on the case of whether any of the digits are
+                  larger or smaller
+                 */
                 for(int idx = lhs.length-1;idx>=0;idx--){
                     if(lhs.data[idx]<rhs.data[idx]){
                         return true;
@@ -475,6 +479,7 @@ namespace cosc326 {
     }
 
     bool operator> (const Integer& lhs, const Integer& rhs) {
+        //Refer to other functions
         if(lhs<rhs){
             return false;
         }else{
@@ -482,6 +487,7 @@ namespace cosc326 {
         }
     }
     bool operator<=(const Integer& lhs, const Integer& rhs) {
+        //Refer to other functions
         if(lhs<rhs || lhs==rhs){
             return true;
         }else{
@@ -490,6 +496,7 @@ namespace cosc326 {
     }
 
     bool operator>=(const Integer& lhs, const Integer& rhs) {
+        //Refer to other function
         if(lhs>rhs || lhs==rhs){
             return true;
         }else{
@@ -498,6 +505,7 @@ namespace cosc326 {
     }
 
     bool operator==(const Integer& lhs, const Integer& rhs) {
+        /* Check if equal, by checking sign, length and each digit */
         if(lhs.sign !=rhs.sign){
             return false;
         }else if(lhs.length!=rhs.length){
@@ -513,6 +521,7 @@ namespace cosc326 {
     }
 
     bool operator!=(const Integer& lhs, const Integer& rhs) {
+        //oposition to equal
         return !(lhs==rhs);
     }
     Integer gcd(const Integer& a, const Integer& b) {
