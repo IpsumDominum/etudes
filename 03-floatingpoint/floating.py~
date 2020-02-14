@@ -27,7 +27,6 @@ def parseIBMfloating(inputpath,inputprecision):
         if(inputpath.endswith(".bin")):
             stringthing = ""
             byte = file.read(1)
-            stringthing += byte
             while byte!="":
                 byte = file.read(1)
                 stringthing +=byte
@@ -43,8 +42,6 @@ def parseIBMfloating(inputpath,inputprecision):
             stringerthings = file.readlines()
         for linenum,oneNum in enumerate(stringerthings):
             oneNum = oneNum.strip("\n").replace(" ","")
-            if(oneNum ==""):
-                continue
             #Check if oneNum is hex            
             if(len(oneNum)!=8):
                 print("line: {} | Ignored: {}".format(linenum,oneNum))
@@ -74,7 +71,7 @@ def parseIBMfloating(inputpath,inputprecision):
             results.append(result)
     return results
 
-def writeIEEE(outputpath,results,outputprecision,outputhex):
+def writeIEEE(outputpath,results,outputprecision):
     """
     writeIEEE
          @outputpath - output file path, output file will be
@@ -102,17 +99,10 @@ def writeIEEE(outputpath,results,outputprecision,outputhex):
                             packed = "7F800000"
                         elif(data<0):
                             packed = "FF800000"
-                    else:
-                        if(data>=0):
-                            packed = "01111111100000000000000000000000"
-                        elif(data<0):
-                            packed = "01111111100000000000000000000000"
-                if(outputhex):
-                    if(writetype=="wb"):
-                        out_file.write(binascii.unhexlify(packed))
-                    else:
-                        out_file.write(packed+"\n")
-                    continue
+                    if(data>=0):
+                        packed = "01111111100000000000000000000000"
+                    elif(data<0):
+                        packed = "01111111100000000000000000000000"
                 bin = "{0:08b}".format(int(packed,16))
                 if(bin[0]=="0"):
                     if(int(bin)==0):
@@ -121,37 +111,24 @@ def writeIEEE(outputpath,results,outputprecision,outputhex):
                     if(int(bin[1:])==0):
                         bin = "1"+"0"*31
                 if(len(bin)==31):
-                    if(writetype=="wb"):
-                        converted = map(int,list("0"+bin))
-                        out_file.write(bytearray(converted))
-                    else:
-                        out_file.write("0"+bin+"\n")
+                    out_file.write("0"+bin)
                 else:
-                    if(writetype=="wb"):
-                        converted = map(int,list(bin))
-                        out_file.write(bytearray(converted))
-                    else:
-                        out_file.write(bin+"\n")
+                    out_file.write(bin)
             elif(outputprecision=="double"):
                 try:
                     packed = struct.pack('>d',data).encode('hex')
                 except OverflowError:
+                    """
                     if(outputhex):
                         if(data>=0):
                             packed = "7F80000000000000"
                         elif(data<0):
                             packed = "FF80000000000000"
-                    else:
-                        if(data>=0):
-                            packed = "01111111100000000000000000000000" + "0"*32
-                        elif(data<0):
-                            packed = "11111111100000000000000000000000" + "0"*32
-                if(outputhex):
-                    if(writetype=="wb"):
-                        out_file.write(binascii.unhexlify(packed))
-                    else:
-                        out_file.write(packed+"\n")
-                    continue
+                    """
+                    if(data>=0):
+                        packed = "01111111100000000000000000000000" + "0"*32
+                    elif(data<0):
+                        packed = "11111111100000000000000000000000" + "0"*32
                 bin = "{0:08b}".format(int(packed,16))
                 if(bin[0]=="0"):
                     if(int(bin)==0):
@@ -160,17 +137,9 @@ def writeIEEE(outputpath,results,outputprecision,outputhex):
                     if(int(bin[1:])==0):
                         bin = "1"+"0"*63
                 if(len(bin)==63):
-                    if(writetype=="wb"):
-                        converted = map(int,list("0"+bin))
-                        out_file.write(bytearray(converted))
-                    else:
-                        out_file.write("0"+bin+"\n")
+                    out_file.write("0"+bin+"\n")
                 else:
-                    if(writetype=="wb"):
-                        converted = map(int,list(bin))
-                        out_file.write(converted)
-                    else:
-                        out_file.write(bin+"\n")
+                    out_file.write(bin+"\n")
 
 """
 Helper functions:
