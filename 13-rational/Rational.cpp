@@ -3,6 +3,8 @@
 #include <sstream>
 namespace cosc326 {
 	Rational::Rational() {
+        /*default integer
+         */
             num = Integer();
             denom = Integer();
 			ratsign = 1;
@@ -77,7 +79,7 @@ namespace cosc326 {
         denom = Integer(b);
         ratsign = num.sign * denom.sign;
         num.sign = 1;
-        denom.sign = 1;
+        denom.sign = 1;        
         *this = +*this;
     }
     Rational::Rational(const Integer& a, const Integer& b, const Integer& c) {
@@ -104,7 +106,7 @@ namespace cosc326 {
         return Rational(*this);
     }
     Rational Rational::operator+(){
-        Integer gcdres;
+        Integer gcdres = Integer("0");
         /*Normalize Rational Number here */
         if(num==Integer("0")){
             //denom = Integer("0");
@@ -112,8 +114,11 @@ namespace cosc326 {
             return Rational(*this);
         }
         /*Normalize the numerators and denomenators*/
-        while((gcd(num,denom))!= Integer("1")){
-            gcdres = gcd(num,denom);
+        while(true){
+            gcdres = gcd(num,denom);                    
+            if(gcdres==Integer("1")){
+                break;
+            }
             num /= gcdres;
             denom /= gcdres;
         }
@@ -252,6 +257,10 @@ namespace cosc326 {
         }
         if(i.ratsign<0){
             os<<"-";
+        }
+        if(i.denom==Integer("1")){
+            os<<i.num;
+            return os;
         }
         if(i.num>i.denom){
             os<<i.num/i.denom<<"."<<i.num%i.denom<<"/"<<i.denom;

@@ -56,6 +56,11 @@ namespace cosc326 {
 	bool operator!=(const Integer& lhs, const Integer& rhs); // lhs != rhs
 
 	Integer gcd(const Integer& a, const Integer& b);  // i = gcd(a, b);
+    Integer divide(const Integer& a,const Integer& b);
+    std::pair<Integer,Integer> slowdivide(const Integer& a,const Integer& b);
+    std::pair<Integer,Integer> getFirstDigits(Integer&a, int length);
+    Integer pushFront(const Integer& a,const Integer& b);
+    std::vector<int> toInt(const std::vector<Integer>& a);
 }
 
 #endif

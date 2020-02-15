@@ -324,21 +324,168 @@ namespace cosc326 {
     }
     
     Integer& Integer::operator/=(const Integer& i) {
-        //Refers to the other function
-        std::pair<Integer,Integer> result= slowdivide(*this,i);
-        *this = result.first;
+
+        /*
+          euclidean algorithm division ,
+          minus until reached above dividend.
+          add result by one each iteration
+         */
+
+        /*Long division :
+            First check if one is larger than the other,
+            if dividend is smaller than divisor,
+                return 0
+            else:
+                do division
+            if equal,
+                return 1
+        */
+        if(i==Integer("0")){
+            std::cerr<<"Dvision by Zero"<<"\n";
+            Integer error = Integer("-1");
+            data = error.data;
+            sign = error.sign;
+            length = error.length;
+            return *this;
+        }else if(i==Integer("1")){
+            return *this;
+        }    
+        if(*this ==i){
+            Integer one = Integer("1");
+            *this = one;            
+            return *this;
+        }else if(*this <i){
+            Integer zero = Integer("0");
+            *this = zero;
+            return *this;
+        }
+         /*
+            Division Algorithm:
+                Assuming length of divisor is n
+                Dividend length is m +n
+                where m >=0
+                First slice the right most digits
+                of the amount n.
+                do slow division,
+                check remainder,
+         */
+        Integer dividend = Integer(*this);
+        Integer divisor = Integer(i);
+        std::pair<Integer,Integer> splitdigits;
+        std::pair<Integer,Integer> divtemp;
+        std::vector<Integer> resdata;
+        bool prevbig = false;
+        bool prevzero = false;
+        resdata.resize(length);
+        for(int ids=divisor.length-1;ids<length;ids++){
+            if(prevbig){
+                splitdigits= getFirstDigits(dividend,divisor.length+1);
+            }else{
+                splitdigits= getFirstDigits(dividend,divisor.length);
+            }
+            std::cout<<splitdigits.first<<"splitfirst\n";
+            //std::cout<<divisor<<"divisor\n";
+            divtemp = slowdivide(splitdigits.first,divisor);
+            //std::cout<<divtemp.first<<"first\n";
+            //std::cout<<divtemp.second<<"second\n";
+            if(divtemp.second.length==2){
+                prevbig = true;    
+            }else{
+                prevbig = false;
+            }
+            if(divtemp.first==Integer("0") & divtemp.second.length)
+            std::cout<<divtemp.first<<"\n";
+            dividend = pushFront(splitdigits.second,divtemp.second);
+            resdata[ids]=(divtemp.first);
+        }
+        std::vector<int> finaldata = toInt(resdata);
+        data = finaldata;
+        sign = sign * i.sign;
+        *this = +*this;
         return *this;
     }
 
     Integer& Integer::operator%=(const Integer& i) {
-        //Refers to the other function
-        std::pair<Integer,Integer> result= slowdivide(*this,i);
-        *this = result.second;
+        /*
+          euclidean algorithm division ,
+          minus until reached above dividend.
+          add result by one each iteration
+         */
+
+        /*Long division :
+            First check if one is larger than the other,
+            if dividend is smaller than divisor,
+                return 0
+            else:
+                do division
+            if equal,
+                return 1
+        */
+
+        if(i==Integer("0")){
+            std::cerr<<"Dvision by Zero"<<"\n";
+            Integer error = Integer("-1");
+            data = error.data;
+            sign = error.sign;
+            length = error.length;
+            return *this;
+        }else if(i==Integer("1")){
+            return *this;
+        }
+        if(*this <i){
+            *this = i;
+            return *this;
+        }else if(*this ==i){
+            Integer zero = Integer("0");
+            *this = zero;
+            return *this;
+        }
+         /*
+            Division Algorithm:
+                Assuming length of divisor is n
+                Dividend length is m +n
+                where m >=0
+                First slice the right most digits
+                of the amount n.
+                do slow division,
+                check remainder,
+         */
+           Integer dividend = Integer(*this);
+        Integer divisor = Integer(i);
+        std::pair<Integer,Integer> splitdigits;
+        std::pair<Integer,Integer> divtemp;
+        //std::vector<Integer> resdata;
+        //resdata.resize(length);
+        bool prevbig = false;
+        for(int ids=divisor.length-1;ids<length;ids++){
+            if(prevbig){
+                splitdigits= getFirstDigits(dividend,divisor.length+1);
+            }else{
+                splitdigits= getFirstDigits(dividend,divisor.length);
+            }
+            //std::cout<<splitdigits.first<<"splitfirst\n";
+            //std::cout<<divisor<<"divisor\n";
+            divtemp = slowdivide(splitdigits.first,divisor);
+            //std::cout<<divtemp.first<<"first\n";
+            //std::cout<<divtemp.second<<"second\n";
+            if(divtemp.second.length==2){
+                prevbig = true;    
+            }else{
+                prevbig = false;
+            }
+            if(ids==length-1){
+                dividend = divtemp.second;
+            }else{
+                dividend = pushFront(splitdigits.second,divtemp.second);
+            }
+            //resdata[ids]=(divtemp.first);
+        }
+        *this = +dividend;
         return *this;
     }
 
     Integer operator+(const Integer& lhs,const Integer& rhs) {
-        //Refers to the other function
+        //Referes to the other function
         Integer res = Integer(lhs);
         Integer opthing = Integer(rhs);
         res += opthing;
@@ -346,7 +493,7 @@ namespace cosc326 {
     }
 
     Integer operator-(const Integer& lhs, const Integer& rhs) {
-        //Refers to the other function
+        //Referes to the other function
         Integer res = Integer(lhs);
         Integer opthing = Integer(rhs);
         res -= opthing;
@@ -354,7 +501,7 @@ namespace cosc326 {
     }
 
     Integer operator*(const Integer& lhs, const Integer& rhs) {
-        //Refers to the other function
+        //Referes to the other function
         Integer res = Integer(lhs);
         Integer opthing = Integer(rhs);
         res *= opthing;
@@ -362,7 +509,7 @@ namespace cosc326 {
     }
 
     Integer operator/(const Integer& lhs, const Integer& rhs) {
-        //Refers to the other function
+        //Referes to the other function
         Integer res = Integer(lhs);
         Integer opthing = Integer(rhs);
         res /= opthing;
@@ -370,7 +517,7 @@ namespace cosc326 {
     }
 
     Integer operator%(const Integer& lhs, const Integer& rhs) {
-        //Refers to the other function
+        //Referes to the other function
         Integer res = Integer(lhs);
         Integer opthing = Integer(rhs);
         res %= opthing;
@@ -539,7 +686,150 @@ namespace cosc326 {
         res.length = Q.length;
         return res;
     }
+
     std::pair<Integer,Integer> slowdivide(const Integer& a,const Integer& b){
+        std::pair <Integer,Integer> result;        
+        Integer lhs = Integer(a);
+        Integer rhs = Integer(b);
+        if(rhs==Integer("0")){
+            std::cerr<<"Dvision by Zero"<<"\n";
+            Integer error = Integer("-1");
+            result.first =error;
+            result.second = error;
+            return result;
+        }
+        Integer Q = Integer("0");
+        Q.sign = 1;
+        Integer R = Integer(lhs);
+        R.sign = 1;
+        Integer D = Integer(rhs);
+        D.sign = 1;
+        Integer M = Integer("1");
+        int stepcounter =0;
+        bool ascending = true;
+        bool descending = false;
+        while(true){                
+                /*first ascende*/
+                if(ascending==true){
+                if(stepcounter%10==0){
+                    M = M*Integer("10");
+                    stepcounter =0;
+                }                
+                D = D + D*M;//keep adding D                                
+                if(R<=D){
+                    //if D overshoots R
+                    if(R==D){
+                        //If R meets D, Q is the result and 0 is the Remainder
+                        lhs.sign = lhs.sign * rhs.sign;
+                        lhs.data = Q.data;
+                        lhs.length = Q.length;
+                        lhs = +lhs;
+                        result.first = Q;
+                        result.second = R;
+                        return result;
+                    }
+                    //Otherwise, means we have to slow down
+                    //If go over
+                    if(M!=Integer("1")){
+                        //If M is not integer,
+                        //Reroll back
+                        M = M/Integer("10");
+                        ascending = false;
+                        descending = true;
+                        continue;
+                    }else{
+                        Q = Q + M;//plus the multiple
+                        lhs.sign = lhs.sign * rhs.sign;
+                        lhs.data = Q.data;
+                        lhs.length = Q.length;
+                        lhs = +lhs;
+                        result.first = Q;
+                        result.second = R;
+                        return result;
+                    }
+                }                
+                Q = Q + M;//plus the multiple
+                }else if(descending==true){
+                    if(stepcounter%10==0){
+                    M = M/Integer("10");
+                    stepcounter =0;
+                    }                
+                D = D - D*M;//keep adding D                                
+                if(R<=D){
+                    //if D overshoots R
+                    if(R==D){
+                        //If R meets D, Q is the result and 0 is the Remainder
+                        lhs.sign = lhs.sign * rhs.sign;
+                        lhs.data = Q.data;
+                        lhs.length = Q.length;
+                        lhs = +lhs;
+                        result.first = Q;
+                        result.second = R;
+                        return result;
+                    }
+                    //Otherwise, means we have to slow down
+                    //If go over
+                    if(M!=Integer("1")){
+                        //If M is not integer,
+                        //Reroll back
+                        M = M/Integer("10");
+                        ascending = false;
+                        descending = true;
+                        continue;
+                    }else{
+                        Q = Q + M;//plus the multiple
+                        lhs.sign = lhs.sign * rhs.sign;
+                        lhs.data = Q.data;
+                        lhs.length = Q.length;
+                        lhs = +lhs;
+                        result.first = Q;
+                        result.second = R;
+                        return result;
+                    }
+                }                
+                Q = Q - M;//plus the multiple
+                }
+                stepcounter +=1;
+        }            
+        return result;
+    }
+    std::pair<Integer,Integer> getFirstDigits(Integer& a,int length){
+        std::pair<Integer,Integer> res;
+        res.first= a;
+        res.second = Integer();
+        std::vector<int> resdata;
+        std::vector<int> resremaindata;
+        for(int idx=res.first.length-1;idx>=0;idx--){
+            if(length>(res.first.length-1)-idx){
+                resdata.insert(resdata.begin(),res.first.data[idx]);                
+            }else{
+                resremaindata.insert(resremaindata.begin(),res.first.data[idx]);
+            }
+        }
+        res.second.length = res.first.length -length;
+        res.second.data = resremaindata;
+        res.first.data = resdata;
+        res.first.length = length;
+        return res;
+    }
+    Integer pushFront(const Integer& a,const Integer& b){
+        Integer res = Integer(a);
+        for(int idx=0;idx<b.length;idx++){
+            res.data.push_back(b.data[idx]);
+            res.length +=1;
+        }
+        return res;
+    }
+    std::vector<int> toInt(const std::vector<Integer>& a){
+        std::vector<int> res;
+        for(int idx=0;idx<a.size();idx++){
+            res.insert(res.begin(),a[idx].data[0]);
+        }
+        return res;
+    }
+
+
+     std::pair<Integer,Integer> slowdivide(const Integer& a,const Integer& b){
         std::pair <Integer,Integer> result;        
         Integer lhs = Integer(a);
         Integer rhs = Integer(b);
@@ -558,29 +848,90 @@ namespace cosc326 {
         D.sign = 1;
         Integer INC = Integer(rhs);
         Integer M = Integer("1");
+        int stepcounter =11;
+        bool ascending = true;
+        bool descending = false;
         while(true){
-            D += INC *M;
-            if(D>=R){
-                if(M==Integer("1")){
-                    result.first = Q;
-                    result.second = R-(Q*M);
-                    return result;
-                }
-                //If over shoots, go back one.
-                D -= INC *M;
-                M =  Integer("1");
-                while(true){
-                    //After overshot...
-                    D += INC *M;
-                    if(D>=R){
+            /*first ascend*/
+            if(ascending==true){
+                if(stepcounter%10==0){
+                    M = M*Integer("10");
+                    stepcounter =1;
+                }        
+                D += INC*M;//keep adding D                                
+                Q = Q + M;//plus the multiple
+                if(R<=D){                                    
+                //if D overshoots R
+                    if(R==D){
+                    //If R meets D, Q is the result and 0 is the Remainder
+                        lhs.sign = lhs.sign * rhs.sign;
+                        lhs.data = Q.data;
+                        lhs.length = Q.length;
+                        lhs = +lhs;
                         result.first = Q;
-                        result.second = R-(Q*M);
+                        result.second = R;
                         return result;
                     }
+                    //Otherwise, means we have to slow down
+                    //If go over
+                    if(M!=Integer("1")){
+                        //If M is not integer,
+                        //Reroll back
+                        M = divide(M,Integer("10"));
+                        ascending = false;
+                        descending = true;                        
+                    }else{
+                        lhs.sign = lhs.sign * rhs.sign;
+                        lhs.data = Q.data;
+                        lhs.length = Q.length;
+                        lhs = +lhs;
+                        result.first = Q;
+                        result.second = R;
+                        return result;
+                    }
+                }}                
+                else if(descending==true){
+                    if(stepcounter%10==0){
+                    M = divide(M,Integer("10"));
+                    stepcounter =1;
+                    }                
+                D = D - INC*M;//keep adding D                                
+                Q = Q - M;//plus the multiple
+                if(R>=D){                       
+                    //if D overshoots R
+                    if(R==D){
+                        //If R meets D, Q is the result and 0 is the Remainder
+                        lhs.sign = lhs.sign * rhs.sign;
+                        lhs.data = Q.data;
+                        lhs.length = Q.length;
+                        lhs = +lhs;
+                        result.first = Q;
+                        result.second = R;
+                        return result;
+                    }
+                    //Otherwise, means we have to slow down
+                    //If go over
+                    if(M!=Integer("1")){                        
+                        //If M is not integer,
+                        //Reroll back
+                        M = M*Integer("10");
+                        ascending = true;
+                        descending = false;
+                        continue;
+                    }else{
+                        lhs.sign = lhs.sign * rhs.sign;
+                        lhs.data = Q.data;
+                        lhs.length = Q.length;
+                        lhs = +lhs;
+                        result.first = Q;
+                        result.second = R;
+                        return result;
+                    }
+                }                                
                 }
-            }            
-            M *= Integer("10");
-            Q += Integer("1");
-        }
+                stepcounter +=1;
+        }            
+        return result;
     }
+
 }
