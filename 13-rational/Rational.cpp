@@ -5,11 +5,29 @@ namespace cosc326 {
 	Rational::Rational() {
         /*default integer
          */
-            num = Integer();
-            denom = Integer();
-			ratsign = 1;
+            this->num = Integer();
+            this->denom = Integer();
+            this->ratsign = 1;
 	}
-        Rational::Rational(const std::string& str) {
+    int Rational::getRatSign(){
+        return this->ratsign;
+    }
+    void Rational::setRatSign(int ratsignthing){
+        this->ratsign = ratsignthing;
+    }
+    Integer Rational::getNum(){
+        return this->num;
+    }
+    void Rational::setNum(Integer numthing){
+        this->num = numthing;
+    }
+    Integer Rational::getDenom(){
+        return denom;
+    }
+    void Rational::setDenom(Integer denomthing){
+        this->denom = denomthing;
+    }
+    Rational::Rational(const std::string& str) {
             /* Three cases :
                a
                a/b
@@ -50,14 +68,14 @@ namespace cosc326 {
                 }
             }
             b = Integer(buffer);
-            ratsign = w.sign * b.sign * a.sign;
+            this->ratsign = w.getSign() * b.getSign() * a.getSign();
             if(founddot){
                 a += w *b;				
             }			
-            num = a;
-            denom = b;			
-            num.sign = 1;
-            denom.sign = 1;
+            this->num = a;
+            this->denom = b;			
+            this->num.setSign(1);
+            this->denom.setSign(1);
             *this = +*this;
 	}
     Rational::Rational(const Rational& r) {
@@ -66,104 +84,106 @@ namespace cosc326 {
     }
     Rational::Rational(const Integer& a) {
         /*Becomes a*/
-        num = Integer(a);
-        denom = Integer("1");			
-        ratsign = num.sign;
-        num.sign = 1;
-        denom.sign = 1;
+        this->num = Integer(a);
+        this->denom = Integer("1");			
+        this->ratsign = num.getSign();
+        num.setSign(1);
+        denom.setSign(1);
         *this = +*this;
     }
     Rational::Rational(const Integer& a, const Integer& b) {
         /*Becomes a/b*/
-        num = Integer(a);
-        denom = Integer(b);
-        ratsign = num.sign * denom.sign;
-        num.sign = 1;
-        denom.sign = 1;        
+        this->num = Integer(a);
+        this->denom = Integer(b);
+        this->ratsign = this->num.getSign() * this->denom.getSign();
+        this->num.setSign(1);
+        this->denom.setSign(1);        
         *this = +*this;
     }
     Rational::Rational(const Integer& a, const Integer& b, const Integer& c) {
         /*Becomes a+b/c*/
-        num = Integer(a) + Integer(b);		
-        denom = Integer(c);		
-        ratsign = num.sign * denom.sign;
-        num.sign = 1;
-        denom.sign = 1;
+        this->num = Integer(a) + Integer(b);		
+        this->denom = Integer(c);		
+        this->ratsign = this->num.getSign() * this->denom.getSign();
+        this->num.setSign(1);
+        this->denom.setSign(1);
         *this = +*this;
     }
     Rational::~Rational() {
         /*destructor skipped*/
     }
     Rational& Rational::operator=(const Rational& r) {
-        /*assignment operator*/
-        num = r.num;
-        denom = r.denom;
-        ratsign = r.ratsign;
+        /*asthis->signment operator*/
+        Rational t = Rational(r);
+        this->num = t.getNum();
+        this->denom = t.getDenom();
+        this->ratsign = t.getRatSign();
         return *this;
     }
     Rational Rational::operator-(){
-        ratsign = -1 *ratsign;
+        this->ratsign = -1 *this->ratsign;
         return Rational(*this);
     }
     Rational Rational::operator+(){
         Integer gcdres = Integer("0");
-        num.sign = 1;
-        denom.sign = 1;
-        /*Normalize Rational Number here */
-        if(num==Integer("0")){
-            //denom = Integer("0");
-            ratsign = 1;
+        this->num.setSign(1);
+        this->denom.setSign(1);
+        /*Normalize Rational This->Number here */
+        if(this->num==Integer("0")){
+            //this->denom = Integer("0");
+            this->ratsign = 1;
             return Rational(*this);
         }
-        /*Normalize the numerators and denomenators*/
+        /*Normalize the this->numerators and this->denomenators*/
         while(true){
-            gcdres = gcd(num,denom);
+            gcdres = gcd(this->num,this->denom);
             if(gcdres==Integer("1")){
                 break;
             }
-            num = num/gcdres;
-            denom = denom/ gcdres;
+            this->num = this->num/gcdres;
+            this->denom = this->denom/ gcdres;
         }
         return Rational(*this);
     }
-    Rational& Rational::operator+=(const Rational& r) {
+    Rational& Rational::operator+=(const Rational& pr) {
             /* 4 cases:
                a + b = a +b 
                a + -b = a -b
                -a + b = b -a
                -a + -b = -(a+b)
             */
-            if(ratsign==1 ){			
-                if(r.ratsign ==1){
+            Rational r = Rational(pr);
+            if(this->ratsign==1 ){			
+                if(r.getRatSign() ==1){
                     /*pass, a+b=a+b*/
-                }else if(r.ratsign==-1){
+                }else if(r.getRatSign()==-1){
                     /*send to a-=b*/
                     Rational rhs = Rational(r);
-                    rhs.ratsign = 1;				
+                    rhs.getRatSign() = 1;				
                     *this -= rhs;
                     return *this;
                 }
-            }else if(ratsign==-1){
-                if(r.ratsign ==1){
+            }else if(this->ratsign==-1){
+                if(r.getRatSign() ==1){
                     /*send to b-=a*/
                     Rational rhs = Rational(r);
-                    ratsign = 1;				
+                    this->ratsign = 1;				
                     rhs -= *this;
                     *this = Rational(rhs);
                     return *this;
-                }else if(r.ratsign==-1){
+                }else if(r.getRatSign()==-1){
                     Rational rhs = Rational(r);
-                    rhs.ratsign = 1;
+                    rhs.getRatSign() = 1;
                     *this = -(*this + rhs);
                     return *this;
                 }
             }
             Rational rhs = Rational(r);
-            denom *= rhs.denom;
-            /*normalize denom*/
-            num *= rhs.denom;
-            rhs.num *= rhs.denom;
-            num += rhs.num;
+            this->denom *= rhs.getRatSign();
+            /*normalize this->denom*/
+            this->num *= rhs.getRatSign();
+            rhs.getRatSign() *= rhs.getRatSign();
+            this->num += rhs.getRatSign();
             *this = +*this;
             return *this;
 	}
@@ -174,50 +194,50 @@ namespace cosc326 {
            -a - b = -(a + b)
            -a - -b = b-a
         */
-        if(ratsign==1 ){			
-            if(r.ratsign ==1){
+        if(this->ratsign==1 ){			
+            if(r.getRatSign() ==1){
                 /*pass, a-b*/
-            }else if(r.ratsign==-1){
+            }else if(r.getRatSign()==-1){
                 /*send to a + b*/
                 *this = *this + r;
                 return *this;
             }
-        }else if(ratsign==-1){
-            if(r.ratsign ==1){
+        }else if(this->ratsign==-1){
+            if(r.getRatSign() ==1){
                 /*send -(a+b)*/
                 *this = -(*this + r);
                 return *this;
-            }else if(r.ratsign==-1){
+            }else if(r.getRatSign()==-1){
                 /*send to b-a*/
                 Rational rhs = Rational(r);
-                ratsign = 1;				
+                this->ratsign = 1;				
                 rhs -= *this;
                 *this = Rational(rhs);
                 return *this;
             }
         }		
 		Rational rhs = Rational(r);
-		denom *= rhs.denom;
-		/*normalize denom*/
-		num *= rhs.denom;
-		rhs.num *= rhs.denom;
-		num -= rhs.num;		
+		this->denom *= rhs.getRatSign();
+		/*normalize this->denom*/
+		this->num *= rhs.getRatSign();
+		rhs.getRatSign() *= rhs.getRatSign();
+		this->num -= rhs.getRatSign();		
 		*this = +*this;
 		return *this;
     }
     Rational& Rational::operator*=(const Rational& r) {
-        /*multiply numerators and denomenators*/
-        ratsign = ratsign * r.ratsign;
-        num *= r.num;
-        denom *=r.denom;
+        /*multiply this->numerators and this->denomenators*/
+        this->ratsign = this->ratsign * r.getRatSign();
+        this->num *= r.getRatSign();
+        this->denom *=r.getRatSign();
         *this = +*this;
         return *this;
     }
     Rational& Rational::operator/=(const Rational& r) {
-        /*multiply the inverse of the second number, by numerator->denomenator, denomenator->numerator*/
-        ratsign = ratsign * r.ratsign;
-        num *= r.denom;
-        denom *= r.num;
+        /*multiply the inverse of the second this->number, by this->numerator->this->denomenator, this->denomenator->this->numerator*/
+        this->ratsign = this->ratsign * r.getRatSign();
+        this->num *= r.getRatSign();
+        this->denom *= r.getRatSign();
         return *this;
     }
     Rational operator+(const Rational& lhs, const Rational& rhs) {
@@ -250,31 +270,31 @@ namespace cosc326 {
     }
     std::ostream& operator<<(std::ostream& os, const Rational& i) {
         //Streaming operator
-        if(i.num==Integer("0")){
+        if(i.getRatSign()==Integer("0")){
             os<<"0";
             return os;
-        }else if(i.num==i.denom){
+        }else if(i.getRatSign()==i.getRatSign()){
             os<<"1";
             return os;
         }
-        if(i.ratsign<0){
+        if(i.getRatSign()<0){
             os<<"-";
         }
-        if(i.denom==Integer("1")){
-            os<<i.num;
+        if(i.getRatSign()==Integer("1")){
+            os<<i.getRatSign();
             return os;
         }
-        if(i.num>i.denom){
-            os<<i.num/i.denom<<"."<<i.num%i.denom<<"/"<<i.denom;
-        }else if(i.num==i.denom){
+        if(i.getRatSign()>i.getRatSign()){
+            os<<i.getRatSign()/i.getRatSign()<<"."<<i.getRatSign()%i.getRatSign()<<"/"<<i.getRatSign();
+        }else if(i.getRatSign()==i.getRatSign()){
             os<<"1";
         }else{
-            os<<i.num<<"/"<<i.denom;
+            os<<i.getRatSign()<<"/"<<i.getRatSign();
         }
         return os;
     }
     std::istream& operator>>(std::istream& is, Rational& i) {
-        //assignment through string stream
+        //asthis->signment through string stream
         char c;
         std::string result = "";
         while(is>>c){
@@ -284,9 +304,9 @@ namespace cosc326 {
         return is;
     }
     bool operator<(const Rational& lhs, const Rational& rhs) {
-        //Compares denomenator and numerator
-        Integer compA = lhs.num * rhs.denom;
-        Integer compB = rhs.num * lhs.denom;
+        //Compares this->denomenator and this->numerator
+        Integer compA = lhs.getRatSign() * rhs.getRatSign();
+        Integer compB = rhs.getRatSign() * lhs.getRatSign();
         if(compA <compB){
             return true;
         }else{
@@ -308,10 +328,10 @@ namespace cosc326 {
     
     bool operator==(const Rational& lhs, const Rational& rhs) {
         //Check for both things
-        if(lhs.num ==Integer("0") & rhs.num==Integer("0")){
+        if(lhs.setRatSign(=Integer("0") & rhs.getRatSign()==Integer("0")){
             return true;
         }
-        if(lhs.num== rhs.num & lhs.denom == rhs.denom){
+        if(lhs.getRatSign()== rhs.getRatSign() & lhs.setRatSign(= rhs.getRatSign()){
             return true;
         }else{
             return false;

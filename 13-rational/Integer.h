@@ -11,9 +11,7 @@ namespace cosc326 {
 	class Integer {
 
 	public:
-            std::vector<int> data;
-            int sign;
-            int length;
+           
             Integer();                             // Integer i;
             Integer(const Integer& i);             // Integer j(i);
             Integer(const std::string& s);         // Integer k("123");
@@ -31,13 +29,20 @@ namespace cosc326 {
             Integer& operator*=(const Integer& i); // j *= i;
             Integer& operator/=(const Integer& i); // j /= i;
             Integer& operator%=(const Integer& i); // j %= i;
-            
+            int getSign();
+            void setSign(int signthing);
+            int getLength();
+            void setLength(int lengththing);
+            int getData();
+            void setData(std::vector<int> datathing);
             // lhs < rhs -- a 'friend' means operator isn't a member, but can access the private parts of the class.
             // You may need to make some other functions friends, but do so sparingly.
             friend bool operator<(const Integer& lhs, const Integer& rhs);
 
 	private:
-
+            int sign;
+            std::vector<int> data;
+            int length;
 	};
 	// Binary operators
 	Integer operator+(const Integer& lhs, const Integer& rhs); // lhs + rhs;
@@ -45,7 +50,6 @@ namespace cosc326 {
 	Integer operator*(const Integer& lhs, const Integer& rhs); // lhs * rhs;
 	Integer operator/(const Integer& lhs, const Integer& rhs); // lhs / rhs;
 	Integer operator%(const Integer& lhs, const Integer& rhs); // lhs % rhs;
-
 	std::ostream& operator<<(std::ostream& os, const Integer& i);  // std::cout << i << std::endl;
 	std::istream& operator>>(std::istream& is, Integer& i);        // std::cin >> i;
 

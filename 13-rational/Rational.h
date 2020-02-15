@@ -10,10 +10,7 @@
 namespace cosc326 {
 
 	class Rational {
-	public:
-            Integer denom;
-            Integer num;
-            int ratsign;
+	public:            
             Rational();
             Rational(const std::string& str);
             Rational(const Rational& r);
@@ -26,6 +23,13 @@ namespace cosc326 {
             // Unary operators
             Rational operator-(); // -r;
             Rational operator+(); // +r;
+            int getRatSign();
+             void setRatSign(int ratsignthing);
+             Integer getNum();
+             void setNum(Integer numthing);
+            Integer getDenom();
+            void setDenom(Integer denomthing);
+                
             // Arithmetic assignment operators
             Rational& operator+=(const Rational& r); // q += r;
             Rational& operator-=(const Rational& r); // q -= r;
@@ -36,6 +40,9 @@ namespace cosc326 {
             friend bool operator<(const Rational& lhs, const Rational& rhs);
 	private:
             // Can add internal storage or methods here
+            Integer denom;
+             Integer num;
+             int ratsign;
 	};
 	// Binary operators
 	Rational operator+(const Rational& lhs, const Rational& rhs); // lhs + rhs;
