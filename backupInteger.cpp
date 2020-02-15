@@ -325,12 +325,6 @@ namespace cosc326 {
     
     Integer& Integer::operator/=(const Integer& i) {
 
-        /*
-          euclidean algorithm division ,
-          minus until reached above dividend.
-          add result by one each iteration
-         */
-
         /*Long division :
             First check if one is larger than the other,
             if dividend is smaller than divisor,

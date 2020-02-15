@@ -1,4 +1,4 @@
-#include "Integer.h"
+git ad#include "Integer.h"
 #include <vector>
 #include <sstream>
 #include <string>
@@ -296,10 +296,14 @@ namespace cosc326 {
          */
         int res = 0;
         int carry = 0;
+        int doublecarry = 0;
         sign = sign * i.sign;
         std::vector<int> result;
-        result.resize(length+i.length);
+        result.resize(length+i.length+1);
         std::fill(result.begin(),result.end(),0);
+        /*
+          First build up a result array
+         */
         for(int jdx=0;jdx<i.length;jdx++){
             for(int idx=0;idx<length;idx++){
                 res = 0;
@@ -307,14 +311,25 @@ namespace cosc326 {
                 result[idx+jdx] = res;
             }
         }
+
+        /*
+          Handle all carries, in the result array
+         */
         for(int ids=0;ids<length+i.length;ids++){
-            result[ids] += carry;
-            if(result[ids]>=10){
+            //result[ids] += carry;
+            //result[ids+1] += doublecarry;
+            if(result[ids]>=100){
+                doublecarry = std::to_string(result[ids])[0] - '0';
+                carry = std::to_string(result[ids])[1] - '0';
+                res  = std::to_string(result[ids])[2] -'0';
+                result[ids] = res;
+                result[ids+1] += carry;
+                result[ids+2] += doublecarry;
+            }else if(result[ids]>=10){
                 carry = std::to_string(result[ids])[0] - '0';
                 res  = std::to_string(result[ids])[1] -'0';
                 result[ids] = res;
-            }else{
-                carry = 0;
+                result[ids+1] += carry;
             }
         }
         data = result;
@@ -325,14 +340,14 @@ namespace cosc326 {
     
     Integer& Integer::operator/=(const Integer& i) {
         //Refers to the other function
-        std::pair<Integer,Integer> result= slowdivide(*this,i);
+        std::pair<Integer,Integer> result= divide(*this,i);
         *this = result.first;
         return *this;
     }
 
     Integer& Integer::operator%=(const Integer& i) {
         //Refers to the other function
-        std::pair<Integer,Integer> result= slowdivide(*this,i);
+        std::pair<Integer,Integer> result= divide(*this,i);
         *this = result.second;
         return *this;
     }
@@ -488,61 +503,29 @@ namespace cosc326 {
         if(bcopy==Integer("1")){
             return bcopy;
         }
-        std::cout<<"GCD STARTED"<<"\n";
         while (bcopy != Integer("0"))
             {
                 t = bcopy;
-                std::cout<<"======"<<"\n";                
-                std::cout<<acopy<<"acopytrue\n";
-                std::cout<<bcopy<<"bcopytrue\n";                
                 bcopy = acopy % bcopy;
-                std::cout<<bcopy<<"bcopyalakjsdlastrue\n";
-                std::cout<<"======"<<"\n";
                 acopy = t;
             }
         return acopy;
-    }
-    Integer divide(const Integer& a,const Integer& b){
-        /*
-          euclidean algorithm division ,
-          minus until reached above dividend.
-          add result by one each iteration
-         */
+    }  
+    std::pair<Integer,Integer> divide(const Integer& a,const Integer& b){
         std::pair <Integer,Integer> result;        
         Integer lhs = Integer(a);
         Integer rhs = Integer(b);
-        if(rhs==Integer("0")){
-            std::cerr<<"Dvision by Zero"<<"\n";
-            Integer error = Integer("-1");
-            return error;
+        //Check if lhs is smaller or equal to rhs
+        if(lhs<rhs){
+            result.first = Integer("0");
+            result.second = lhs;
+            return result;
+        }else if(lhs==rhs){
+            result.first = Integer("1");
+            result.second = Integer("0");
+            return result;
         }
-        Integer Q = Integer("0");
-        Q.sign = 1;
-        Integer R = Integer(lhs);
-        R.sign = 1;
-        Integer D = Integer(rhs);
-        D.sign = 1;
-        while(true){
-            Q = Q +Integer("1");
-            R = R -D;
-            if(R<=D){
-                if(R==D){
-                    Q = Q +Integer("1");
-                    break;
-                }
-                break;
-            }
-        }
-        Integer res = Integer();
-        res.sign = a.sign * b.sign;
-        res.data = Q.data;
-        res.length = Q.length;
-        return res;
-    }
-    std::pair<Integer,Integer> slowdivide(const Integer& a,const Integer& b){
-        std::pair <Integer,Integer> result;        
-        Integer lhs = Integer(a);
-        Integer rhs = Integer(b);
+        //Otherwise we assume lhs is larger than rhs
         if(rhs==Integer("0")){
             std::cerr<<"Dvision by Zero"<<"\n";
             Integer error = Integer("-1");
@@ -550,37 +533,50 @@ namespace cosc326 {
             result.second = error;
             return result;
         }
-        Integer Q = Integer("1");
+        Integer Q = Integer("0");
         Q.sign = 1;
         Integer R = Integer(lhs);
         R.sign = 1;
-        Integer D = Integer(rhs);
+        Integer D = Integer("0");
         D.sign = 1;
         Integer INC = Integer(rhs);
+        INC.sign = 1;
         Integer M = Integer("1");
         while(true){
+            /*Start from 0,
+              start adding by increments of divisor*/
+            Q += M;
             D += INC *M;
             if(D>=R){
-                if(M==Integer("1")){
+                if(D==R){
+                    /*When it is equal, return*/
                     result.first = Q;
-                    result.second = R-(Q*M);
+                    result.second = Integer("0");
                     return result;
                 }
-                //If over shoots, go back one.
-                D -= INC *M;
-                M =  Integer("1");
-                while(true){
-                    //After overshot...
-                    D += INC *M;
-                    if(D>=R){
-                        result.first = Q;
-                        result.second = R-(Q*M);
-                        return result;
+                else if(M==Integer("1")){                    
+                    Q-= M;
+                    result.first = Q;
+                    result.second = R-(Q*INC);
+                    return result;
+                }else{
+                    //If over shoots, go back until we are lower than that.
+                    while(D>R){
+                        D -= INC *M;
+                        Q -= M;
+                        if(D==R){
+                            /*When it is equal, return*/
+                            result.first = Q;
+                            result.second = Integer("0");
+                            return result;
+                        }
                     }
+                    M = Integer("1");
                 }
-            }            
-            M *= Integer("10");
-            Q += Integer("1");
+            }else{
+                /*Each round build up momentum */
+                M *= Integer("10");
+            }
         }
     }
 }

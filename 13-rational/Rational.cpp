@@ -107,6 +107,8 @@ namespace cosc326 {
     }
     Rational Rational::operator+(){
         Integer gcdres = Integer("0");
+        num.sign = 1;
+        denom.sign = 1;
         /*Normalize Rational Number here */
         if(num==Integer("0")){
             //denom = Integer("0");
@@ -115,12 +117,12 @@ namespace cosc326 {
         }
         /*Normalize the numerators and denomenators*/
         while(true){
-            gcdres = gcd(num,denom);                    
+            gcdres = gcd(num,denom);
             if(gcdres==Integer("1")){
                 break;
             }
-            num /= gcdres;
-            denom /= gcdres;
+            num = num/gcdres;
+            denom = denom/ gcdres;
         }
         return Rational(*this);
     }
